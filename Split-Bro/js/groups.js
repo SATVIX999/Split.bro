@@ -163,17 +163,8 @@ document.addEventListener("DOMContentLoaded", function () {
         );
     }
 
-    function generateGroupId() {
-        return (
-            "GRP" +
-            Date.now() +
-            Math.random()
-                .toString(36)
-                .substring(2, 7)
-                .toUpperCase()
-        );
-    }
-
+    // Group Code doubles as the group's internal ID too — no need for
+    // a separate one, since the code never changes and is already unique.
     function generateGroupCode() {
         const characters =
             "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -576,13 +567,13 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        const duplicate = groups.some(
-    group =>
-        group.createdBy === currentUser.userId &&
-        String(group.groupName)
-            .toLowerCase() ===
-        name.toLowerCase()
-);
+        const duplicate =
+            groups.some(
+                group =>
+                    String(group.groupName)
+                        .toLowerCase() ===
+                    name.toLowerCase()
+            );
 
         if (duplicate) {
             groupNameError.textContent =
@@ -590,16 +581,21 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
+        // One code, used both as the internal ID and the one you share
+        // to join — no more generating two different values for a group.
+        const code =
+            getUniqueGroupCode();
+
         const newGroup = {
 
             groupId:
-                generateGroupId(),
+                code,
 
             groupName:
                 name,
 
             groupCode:
-                getUniqueGroupCode(),
+                code,
 
             createdBy:
                 currentUser.userId,
