@@ -1,12 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    // --------------------------------------------------
-    // 1. BASIC SETUP
-    // --------------------------------------------------
-
     const currentUser = getCurrentUser();
 
-    // If the user is not logged in, send them to login page.
     if (!currentUser) {
         window.location.href = "login.html";
         return;
@@ -14,8 +9,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const users = getUsers();
 
-    // Get saved groups from localStorage.
-    // If nothing is saved, use an empty array.
     let groups =
         JSON.parse(
             localStorage.getItem("smartSettleGroups")
@@ -24,13 +17,6 @@ document.addEventListener("DOMContentLoaded", function () {
     let newMembers = [];
     let editingGroupId = null;
 
-
-    // --------------------------------------------------
-    // 2. DOM ELEMENTS
-    // --------------------------------------------------
-
-    // Short helper instead of repeatedly writing
-    // document.getElementById().
     const $ = id => document.getElementById(id);
 
     const groupsContainer = $("groupsContainer");
@@ -125,20 +111,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const editGroupNameError =
         $("editGroupNameError");
 
-
-    // --------------------------------------------------
-    // 3. EVENT LISTENER HELPERS
-    // --------------------------------------------------
-
-    // Adds an event listener only if the element exists.
     function on(element, event, handler) {
         if (element) {
             element.addEventListener(event, handler);
         }
     }
 
-    // Adds the same event listener to all matching elements.
-    // Useful for buttons that are created dynamically.
     function onAll(selector, event, handler) {
 
         document
@@ -154,31 +132,13 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // --------------------------------------------------
-    // 4. NORMALIZATION
-    // --------------------------------------------------
-
-    // Converts values into the same format before comparing.
-    //
-    // Example:
-    // " u101 "
-    // "U101"
-    //
-    // Both become:
-    // "U101"
+    
     function normalize(value) {
 
         return String(value)
             .trim()
             .toUpperCase();
     }
-
-
-    // --------------------------------------------------
-    // 5. LOCAL STORAGE AND ID HELPERS
-    // --------------------------------------------------
-
-    // Saves the current groups array to localStorage.
     function saveGroups() {
 
         localStorage.setItem(
@@ -187,11 +147,6 @@ document.addEventListener("DOMContentLoaded", function () {
         );
     }
 
-
-    // Creates an internal Group ID.
-    //
-    // Date.now() gives the current timestamp.
-    // Math.random() adds another random part.
     function generateGroupId() {
 
         return (
@@ -204,9 +159,6 @@ document.addEventListener("DOMContentLoaded", function () {
         );
     }
 
-
-    // Creates a short 6-character Group Code
-    // that users can share with other users.
     function generateGroupCode() {
 
         const characters =
@@ -228,8 +180,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // Keeps generating a Group Code until
-    // a code that is not already being used is found.
     function getUniqueGroupCode() {
 
         let code;
@@ -249,7 +199,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // Finds a group using its internal Group ID.
     function findGroup(groupId) {
 
         return groups.find(
@@ -260,7 +209,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // Finds a group using the user-facing Group Code.
     function findGroupByCode(code) {
 
         return groups.find(
@@ -271,7 +219,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // Finds a registered user using User ID.
     function getUserById(userId) {
 
         return users.find(
@@ -282,7 +229,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // Gets the user's name from their User ID.
     function getUserName(userId) {
 
         const user =
@@ -294,11 +240,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // --------------------------------------------------
-    // 6. MEMBER HELPERS
-    // --------------------------------------------------
-
-    // Checks whether a member is a guest object.
     function isGuest(member) {
 
         return (
@@ -309,7 +250,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // Gets the unique ID of a member.
     function getMemberId(member) {
 
         return isGuest(member)
@@ -318,9 +258,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // Gets the registered user's User ID.
-    //
-    // Guests normally have userId = null.
     function getMemberUserId(member) {
 
         return isGuest(member)
@@ -329,7 +266,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // Gets the display name of a member.
     function getMemberName(member) {
 
         return isGuest(member)
@@ -338,7 +274,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // Creates a guest member object.
     function createGuest(name) {
 
         return {
@@ -359,8 +294,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // Checks whether the currently logged-in user
-    // belongs to a particular group.
     function isCurrentUserMember(group) {
 
         if (
@@ -389,9 +322,6 @@ document.addEventListener("DOMContentLoaded", function () {
         );
     }
 
-
-    // Returns only groups that contain
-    // the currently logged-in user.
     function getVisibleGroups() {
 
         return groups.filter(
@@ -400,10 +330,6 @@ document.addEventListener("DOMContentLoaded", function () {
         );
     }
 
-
-    // --------------------------------------------------
-    // 7. MODAL HELPERS
-    // --------------------------------------------------
 
     function openModal(modal) {
 
@@ -421,7 +347,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // Opens the Create Group modal.
     function openCreateGroup() {
 
         clearCreateForm();
@@ -430,7 +355,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // Opens the Join Group modal.
     function openJoinGroupModal() {
 
         joinGroupCode.value = "";
@@ -444,7 +368,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // Clears the Create Group form.
     function clearCreateForm() {
 
         groupName.value = "";
@@ -460,7 +383,6 @@ document.addEventListener("DOMContentLoaded", function () {
         memberError.textContent = "";
 
 
-        // Reset member mode to Registered User.
         registeredMemberMode.classList.add(
             "active"
         );
@@ -480,10 +402,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // --------------------------------------------------
-    // 8. CREATE-GROUP MEMBER DISPLAY
-    // --------------------------------------------------
-
     function renderSelectedMembers() {
 
         if (!selectedMembers) {
@@ -493,7 +411,6 @@ document.addEventListener("DOMContentLoaded", function () {
         selectedMembers.innerHTML = "";
 
 
-        // Create a visual item for every selected member.
         newMembers.forEach(
             member => {
 
@@ -551,9 +468,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         );
 
-
-        // Add remove functionality to the
-        // newly created remove buttons.
         onAll(
             ".remove-member-button",
             "click",
@@ -576,10 +490,6 @@ document.addEventListener("DOMContentLoaded", function () {
         );
     }
 
-
-    // --------------------------------------------------
-    // 9. ADD REGISTERED MEMBER
-    // --------------------------------------------------
 
     function addMember() {
 
@@ -614,8 +524,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        // Prevent the current user from
-        // adding themselves again.
         if (
             normalize(user.userId) ===
             normalize(currentUser.userId)
@@ -628,7 +536,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        // Check if this member is already selected.
         const exists =
             newMembers.some(
                 member => {
@@ -664,10 +571,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // --------------------------------------------------
-    // 10. ADD GUEST MEMBER
-    // --------------------------------------------------
-
     function addGuestMember() {
 
         memberError.textContent = "";
@@ -686,7 +589,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        // Prevent duplicate guest names.
         const exists =
             newMembers.some(
                 member =>
@@ -715,10 +617,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // --------------------------------------------------
-    // 11. CREATE GROUP
-    // --------------------------------------------------
-
     function createGroup(event) {
 
         event.preventDefault();
@@ -732,7 +630,6 @@ document.addEventListener("DOMContentLoaded", function () {
             groupName.value.trim();
 
 
-        // Validate group name.
         if (name.length < 2) {
 
             groupNameError.textContent =
@@ -742,7 +639,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        // At least one other member is required.
         if (newMembers.length === 0) {
 
             memberError.textContent =
@@ -752,8 +648,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        // Prevent the same creator from creating
-        // another group with the same name.
         const duplicate =
             groups.some(
                 group =>
@@ -780,7 +674,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        // Create the new group object.
         const newGroup = {
 
             groupId:
@@ -809,14 +702,11 @@ document.addEventListener("DOMContentLoaded", function () {
         };
 
 
-        // Add the new group to the groups array.
         groups.push(newGroup);
 
-        // Save updated groups.
         saveGroups();
 
 
-        // Remember the newly created group.
         localStorage.setItem(
             "selectedGroupId",
             newGroup.groupId
@@ -838,12 +728,6 @@ Group Code: ${newGroup.groupCode}`
     }
 
 
-    // --------------------------------------------------
-    // 12. GUEST CLAIMS
-    // --------------------------------------------------
-
-    // Shows guest members that can be claimed
-    // when a user joins a group.
     function prepareGuestClaims(group) {
 
         guestClaimSelect.innerHTML = `
@@ -935,10 +819,6 @@ Group Code: ${newGroup.groupCode}`
     }
 
 
-    // --------------------------------------------------
-    // 13. JOIN GROUP
-    // --------------------------------------------------
-
     function joinGroup(event) {
 
         event.preventDefault();
@@ -985,8 +865,6 @@ Group Code: ${newGroup.groupCode}`
         }
 
 
-        // Check whether the user selected
-        // an existing guest profile to claim.
         const claimId =
             guestClaimSelect.value;
 
@@ -1012,15 +890,11 @@ Group Code: ${newGroup.groupCode}`
                 return;
             }
 
-
-            // Replace the guest object with
-            // the actual registered user's ID.
             group.members[index] =
                 currentUser.userId;
 
         } else {
 
-            // Otherwise add the user normally.
             group.members.push(
                 currentUser.userId
             );
@@ -1049,10 +923,6 @@ Group Code: ${newGroup.groupCode}`
     }
 
 
-    // --------------------------------------------------
-    // 14. OPEN EDIT GROUP
-    // --------------------------------------------------
-
     function openEditGroup(groupId) {
 
         const group =
@@ -1064,7 +934,6 @@ Group Code: ${newGroup.groupCode}`
         }
 
 
-        // Only the creator can edit.
         if (
             normalize(group.createdBy) !==
             normalize(currentUser.userId)
@@ -1098,10 +967,6 @@ Group Code: ${newGroup.groupCode}`
     }
 
 
-    // --------------------------------------------------
-    // 15. RENDER EDIT MEMBERS
-    // --------------------------------------------------
-
     function renderEditMembers(group) {
 
         editSelectedMembers.innerHTML =
@@ -1118,8 +983,6 @@ Group Code: ${newGroup.groupCode}`
                     getMemberId(member);
 
 
-                // The creator/current user cannot
-                // remove themselves.
                 const isSelf =
                     normalize(
                         getMemberUserId(member)
@@ -1190,9 +1053,6 @@ Group Code: ${newGroup.groupCode}`
             ".remove-edit-member-button",
             "click",
             button => {
-
-                // A group must always contain
-                // at least two members.
                 if (
                     group.members.length <= 2
                 ) {
@@ -1227,10 +1087,6 @@ Group Code: ${newGroup.groupCode}`
         );
     }
 
-
-    // --------------------------------------------------
-    // 16. ADD REGISTERED MEMBER WHILE EDITING
-    // --------------------------------------------------
 
     function addEditMember() {
 
@@ -1319,10 +1175,6 @@ Group Code: ${newGroup.groupCode}`
     }
 
 
-    // --------------------------------------------------
-    // 17. ADD GUEST WHILE EDITING
-    // --------------------------------------------------
-
     function addEditGuestMember() {
 
         editMemberError.textContent =
@@ -1387,9 +1239,6 @@ Group Code: ${newGroup.groupCode}`
     }
 
 
-    // --------------------------------------------------
-    // 18. SAVE EDITED GROUP
-    // --------------------------------------------------
 
     function saveEditedGroup(event) {
 
@@ -1432,9 +1281,6 @@ Group Code: ${newGroup.groupCode}`
     }
 
 
-    // --------------------------------------------------
-    // 19. DELETE GROUP
-    // --------------------------------------------------
 
     function deleteGroup(groupId) {
 
@@ -1447,7 +1293,6 @@ Group Code: ${newGroup.groupCode}`
         }
 
 
-        // Only the creator can delete.
         if (
             normalize(group.createdBy) !==
             normalize(currentUser.userId)
@@ -1472,7 +1317,6 @@ Group Code: ${newGroup.groupCode}`
         }
 
 
-        // Remove the selected group.
         groups =
             groups.filter(
                 group =>
@@ -1483,9 +1327,6 @@ Group Code: ${newGroup.groupCode}`
 
         saveGroups();
 
-
-        // If the deleted group was selected,
-        // remove it from localStorage too.
         if (
             normalize(
                 localStorage.getItem(
@@ -1505,9 +1346,6 @@ Group Code: ${newGroup.groupCode}`
     }
 
 
-    // --------------------------------------------------
-    // 20. LEAVE GROUP
-    // --------------------------------------------------
 
     function leaveGroup(groupId) {
 
@@ -1520,7 +1358,6 @@ Group Code: ${newGroup.groupCode}`
         }
 
 
-        // The creator cannot leave their own group.
         if (
             normalize(group.createdBy) ===
             normalize(currentUser.userId)
@@ -1545,9 +1382,6 @@ Group Code: ${newGroup.groupCode}`
         }
 
 
-        // Remove the current user.
-        //
-        // Guest profiles are kept in the group.
         group.members =
             group.members.filter(
                 member => {
@@ -1587,12 +1421,6 @@ Group Code: ${newGroup.groupCode}`
         renderGroups();
     }
 
-
-    // --------------------------------------------------
-    // 21. EXPENSE CALCULATION
-    // --------------------------------------------------
-
-    // Adds all expense amounts in a group.
     function getTotalExpenses(group) {
 
         return (
@@ -1611,10 +1439,6 @@ Group Code: ${newGroup.groupCode}`
     }
 
 
-    // --------------------------------------------------
-    // 22. RENDER GROUP CARDS
-    // --------------------------------------------------
-
     function renderGroups() {
 
         if (!groupsContainer) {
@@ -1630,8 +1454,6 @@ Group Code: ${newGroup.groupCode}`
             getVisibleGroups();
 
 
-        // If the user has no groups,
-        // show the empty state.
         if (
             visibleGroups.length === 0
         ) {
@@ -1661,7 +1483,6 @@ Group Code: ${newGroup.groupCode}`
         }
 
 
-        // Create one card for every visible group.
         visibleGroups.forEach(
             group => {
 
@@ -1936,7 +1757,6 @@ Group Code: ${newGroup.groupCode}`
 
                 } catch (error) {
 
-                    // Fallback if clipboard access fails.
                     alert(
                         "Group Code: " +
                         code
@@ -1946,7 +1766,6 @@ Group Code: ${newGroup.groupCode}`
         );
 
 
-        // Edit group.
         onAll(
             ".edit-group-button",
             "click",
@@ -1959,7 +1778,6 @@ Group Code: ${newGroup.groupCode}`
         );
 
 
-        // Delete group.
         onAll(
             ".delete-group-button",
             "click",
@@ -1972,7 +1790,6 @@ Group Code: ${newGroup.groupCode}`
         );
 
 
-        // Leave group.
         onAll(
             ".leave-group-button",
             "click",
@@ -1986,11 +1803,6 @@ Group Code: ${newGroup.groupCode}`
     }
 
 
-    // --------------------------------------------------
-    // 23. MODAL EVENTS
-    // --------------------------------------------------
-
-    // Create Group buttons.
     on(
         openGroupModal,
         "click",
@@ -2018,7 +1830,6 @@ Group Code: ${newGroup.groupCode}`
     );
 
 
-    // Close buttons.
     on(
         closeCreateModal,
         "click",
@@ -2070,10 +1881,6 @@ Group Code: ${newGroup.groupCode}`
     );
 
 
-    // --------------------------------------------------
-    // 24. CREATE-GROUP MEMBER MODE
-    // --------------------------------------------------
-
     on(
         registeredMemberMode,
         "click",
@@ -2120,10 +1927,6 @@ Group Code: ${newGroup.groupCode}`
     );
 
 
-    // --------------------------------------------------
-    // 25. CREATE-GROUP MEMBER EVENTS
-    // --------------------------------------------------
-
     on(
         addMemberButton,
         "click",
@@ -2138,8 +1941,6 @@ Group Code: ${newGroup.groupCode}`
     );
 
 
-    // Pressing Enter in the User ID field
-    // adds the registered member.
     on(
         memberUserId,
         "keydown",
@@ -2154,9 +1955,6 @@ Group Code: ${newGroup.groupCode}`
         }
     );
 
-
-    // Pressing Enter in guest name field
-    // adds the guest.
     on(
         guestMemberName,
         "keydown",
@@ -2172,9 +1970,6 @@ Group Code: ${newGroup.groupCode}`
     );
 
 
-    // --------------------------------------------------
-    // 26. CREATE AND JOIN FORMS
-    // --------------------------------------------------
 
     on(
         groupForm,
@@ -2183,7 +1978,6 @@ Group Code: ${newGroup.groupCode}`
     );
 
 
-    // Check Group Code while typing.
     on(
         joinGroupCode,
         "input",
@@ -2197,10 +1991,6 @@ Group Code: ${newGroup.groupCode}`
         joinGroup
     );
 
-
-    // --------------------------------------------------
-    // 27. EDIT MEMBER MODE
-    // --------------------------------------------------
 
     on(
         editRegisteredMemberMode,
@@ -2264,9 +2054,6 @@ Group Code: ${newGroup.groupCode}`
     );
 
 
-    // --------------------------------------------------
-    // 28. EDIT MEMBER EVENTS
-    // --------------------------------------------------
 
     on(
         editAddMemberButton,
@@ -2282,7 +2069,6 @@ Group Code: ${newGroup.groupCode}`
     );
 
 
-    // Enter key for adding a guest while editing.
     on(
         editGuestMemberName,
         "keydown",
@@ -2298,20 +2084,12 @@ Group Code: ${newGroup.groupCode}`
     );
 
 
-    // Save edited group.
     on(
         editGroupForm,
         "submit",
         saveEditedGroup
     );
 
-
-    // --------------------------------------------------
-    // 29. INITIAL RENDER
-    // --------------------------------------------------
-
-    // Display the user's groups immediately
-    // when the page loads.
     renderGroups();
 
 });
