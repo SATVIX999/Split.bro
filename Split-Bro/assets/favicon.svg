@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- rounded square background, same blue as the navbar logo box -->
+  <rect x="4" y="4" width="56" height="56" rx="16" fill="#38bdf8"/>
+  <!-- simple wallet glyph in the same dark navy used for the icon color -->
+  <rect x="15" y="20" width="34" height="26" rx="5" fill="#07111f"/>
+  <rect x="15" y="20" width="34" height="8" rx="4" fill="#0b1c33"/>
+  <circle cx="40" cy="34" r="3.5" fill="#38bdf8"/>
+</svg>
