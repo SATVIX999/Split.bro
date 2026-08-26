@@ -81,3 +81,7 @@ The system calculates each member's balance based on their expenses and payments
 - **Satvik Sharma** — 2410992972
 - **Mayur Mittal** — 2410993231
 - **Shriya Khaturia** — 2410992888
+
+- A quick look on our website
+- <img width="1892" height="912" alt="image" src="https://github.com/user-attachments/assets/f2ae6167-96d9-46ff-a8f2-df1f314049d7" />
+
