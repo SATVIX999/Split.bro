@@ -276,4 +276,5 @@ passwordForm.addEventListener("submit", (event) => {
     updatePasswordCheck(uppercaseCheck, false);
     updatePasswordCheck(lowercaseCheck, false);
     updatePasswordCheck(numberCheck, false);
+    updatePasswordCheck(symbolCheck, false);
 });
