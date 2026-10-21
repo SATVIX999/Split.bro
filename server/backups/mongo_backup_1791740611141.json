@@ -1,0 +1,309 @@
+{
+  "users": [
+    {
+      "_id": "6acba1dfcfbd0b4fe30b3597",
+      "name": "Mayur Sharma",
+      "email": "mayur@example.com",
+      "userId": "MAYUR01",
+      "password": "$2b$10$VDyeL/KGew/c0d4BWh4RZO3q2TI0OcUepXTZY2YWfFF0nHO2Tzpky",
+      "avatar": "",
+      "bio": "Trip planner & avid traveler",
+      "upiId": "mayur@upi",
+      "phone": "",
+      "createdAt": "2026-10-11T14:49:03.060Z",
+      "updatedAt": "2026-10-11T14:49:03.060Z",
+      "__v": 0
+    },
+    {
+      "_id": "6acba1dfcfbd0b4fe30b3598",
+      "name": "Satvik Patel",
+      "email": "satvik@example.com",
+      "userId": "SATVIK01",
+      "password": "$2b$10$i2dfnhNWpUd3zIS3ZqcnM.m0R53BgjGPyrilslFXQKEblrXBnVgb.",
+      "avatar": "",
+      "bio": "Foodie and photographer",
+      "upiId": "satvik@okhdfcbank",
+      "phone": "",
+      "createdAt": "2026-10-11T14:49:03.202Z",
+      "updatedAt": "2026-10-11T14:49:03.202Z",
+      "__v": 0
+    },
+    {
+      "_id": "6acba1dfcfbd0b4fe30b3599",
+      "name": "Shriya Verma",
+      "email": "shriya@example.com",
+      "userId": "SHRIYA01",
+      "password": "$2b$10$3Mk0t9CfH2ho9YUD6fpZnOuNb6DXbw8s3aAgy91UpsvGzsgXTi2EC",
+      "avatar": "",
+      "bio": "Budget tracker & accountant",
+      "upiId": "shriya@oksbi",
+      "phone": "",
+      "createdAt": "2026-10-11T14:49:03.330Z",
+      "updatedAt": "2026-10-11T14:49:03.330Z",
+      "__v": 0
+    },
+    {
+      "_id": "6acba1dfcfbd0b4fe30b359a",
+      "name": "Aman Kumar",
+      "email": "aman@example.com",
+      "userId": "AMAN01",
+      "password": "$2b$10$PaIcM.FDRvp/Ff2HNVm8ouX64IXXlGFV73FkJoozmD2cR.kVAHtFu",
+      "avatar": "",
+      "bio": "Always down for weekend road trips",
+      "upiId": "aman@paytm",
+      "phone": "",
+      "createdAt": "2026-10-11T14:49:03.454Z",
+      "updatedAt": "2026-10-11T14:49:03.454Z",
+      "__v": 0
+    }
+  ],
+  "groups": [
+    {
+      "_id": "6acba1dfcfbd0b4fe30b359b",
+      "groupId": "GRP_GOA_2026",
+      "groupName": "Goa Trip 🏖️",
+      "groupCode": "GOA123",
+      "category": "Trip",
+      "description": "Baga beach vacation and seafood dining",
+      "createdBy": "MAYUR01",
+      "members": [
+        {
+          "memberId": "MAYUR01",
+          "name": "Mayur Sharma",
+          "type": "registered",
+          "userId": "MAYUR01",
+          "joinedAt": "2026-10-11T14:49:03.575Z"
+        },
+        {
+          "memberId": "SATVIK01",
+          "name": "Satvik Patel",
+          "type": "registered",
+          "userId": "SATVIK01",
+          "joinedAt": "2026-10-11T14:49:03.575Z"
+        },
+        {
+          "memberId": "SHRIYA01",
+          "name": "Shriya Verma",
+          "type": "registered",
+          "userId": "SHRIYA01",
+          "joinedAt": "2026-10-11T14:49:03.575Z"
+        }
+      ],
+      "createdAt": "2026-10-11T14:49:03.577Z",
+      "updatedAt": "2026-10-11T14:49:03.577Z",
+      "__v": 0
+    },
+    {
+      "_id": "6acba1dfcfbd0b4fe30b359c",
+      "groupId": "GRP_FLAT_402",
+      "groupName": "Flat 402 Expenses 🏠",
+      "groupCode": "FLAT40",
+      "category": "Home",
+      "description": "Monthly groceries, WiFi, maid and maintenance",
+      "createdBy": "MAYUR01",
+      "members": [
+        {
+          "memberId": "MAYUR01",
+          "name": "Mayur Sharma",
+          "type": "registered",
+          "userId": "MAYUR01",
+          "joinedAt": "2026-10-11T14:49:03.582Z"
+        },
+        {
+          "memberId": "AMAN01",
+          "name": "Aman Kumar",
+          "type": "registered",
+          "userId": "AMAN01",
+          "joinedAt": "2026-10-11T14:49:03.582Z"
+        },
+        {
+          "memberId": "GUEST_CHEF",
+          "name": "Cook Uncle",
+          "type": "guest",
+          "userId": null,
+          "joinedAt": "2026-10-11T14:49:03.582Z"
+        }
+      ],
+      "createdAt": "2026-10-11T14:49:03.583Z",
+      "updatedAt": "2026-10-11T14:49:03.583Z",
+      "__v": 0
+    },
+    {
+      "_id": "6acba1ef4257a61fd008c4e8",
+      "groupId": "GRP1791723423051F923",
+      "groupName": "Goa Trip",
+      "groupCode": "61312B",
+      "category": "Trip",
+      "description": "",
+      "createdBy": "MAYUR01",
+      "members": [
+        {
+          "memberId": "MAYUR01",
+          "name": "MAYUR01",
+          "type": "registered",
+          "userId": "MAYUR01",
+          "joinedAt": "2026-10-11T14:49:19.257Z"
+        },
+        {
+          "memberId": "SATVIK01",
+          "name": "SATVIK01",
+          "type": "registered",
+          "userId": "SATVIK01",
+          "joinedAt": "2026-10-11T14:49:19.257Z"
+        },
+        {
+          "memberId": "SHRIYA01",
+          "name": "SHRIYA01",
+          "type": "registered",
+          "userId": "SHRIYA01",
+          "joinedAt": "2026-10-11T14:49:19.258Z"
+        }
+      ],
+      "createdAt": "2026-10-11T12:57:03.051Z",
+      "updatedAt": "2026-10-11T12:57:03.051Z",
+      "__v": 0
+    },
+    {
+      "_id": "6acba1ef4257a61fd008c4e9",
+      "groupId": "GRP17917240240357FF9",
+      "groupName": "Shimla",
+      "groupCode": "FTV8ZY",
+      "category": "Trip",
+      "description": "",
+      "createdBy": "MAYUR01",
+      "members": [
+        {
+          "memberId": "MAYUR01",
+          "name": "MAYUR01",
+          "type": "registered",
+          "userId": "MAYUR01",
+          "joinedAt": "2026-10-11T14:49:19.269Z"
+        },
+        {
+          "memberId": "GUEST_17917240148477yh1",
+          "name": "Mayur",
+          "type": "guest",
+          "userId": null,
+          "joinedAt": "2026-10-11T14:49:19.269Z"
+        }
+      ],
+      "createdAt": "2026-10-11T13:07:01.798Z",
+      "updatedAt": "2026-10-11T13:07:01.798Z",
+      "__v": 0
+    }
+  ],
+  "settlements": [
+    {
+      "_id": "6acba1dfcfbd0b4fe30b35a0",
+      "settlementId": "SET_GOA_001",
+      "groupId": "GRP_GOA_2026",
+      "from": "SATVIK01",
+      "fromName": "Satvik Patel",
+      "to": "MAYUR01",
+      "toName": "Mayur Sharma",
+      "amount": 2000,
+      "paymentMethod": "UPI",
+      "notes": "Initial settlement via Google Pay",
+      "settledBy": "SATVIK01",
+      "settledAt": "2026-10-11T14:49:03.598Z",
+      "createdAt": "2026-10-11T14:49:03.599Z",
+      "updatedAt": "2026-10-11T14:49:03.599Z",
+      "__v": 0
+    }
+  ],
+  "expenses": [
+    {
+      "_id": "6acba1dfcfbd0b4fe30b359d",
+      "expenseId": "EXP_GOA_001",
+      "groupId": "GRP_GOA_2026",
+      "title": "Beach Resort Villa Booking",
+      "amount": 15000,
+      "category": "Hotel",
+      "payerId": "MAYUR01",
+      "payerName": "Mayur Sharma",
+      "payerType": "registered",
+      "splitType": "equal",
+      "participants": [
+        "MAYUR01",
+        "SATVIK01",
+        "SHRIYA01"
+      ],
+      "shares": {
+        "MAYUR01": 5000,
+        "SATVIK01": 5000,
+        "SHRIYA01": 5000
+      },
+      "receiptUrl": null,
+      "receiptOriginalName": null,
+      "receiptMimeType": null,
+      "receiptSize": null,
+      "notes": "3 nights stay near Candolim",
+      "date": "2026-10-11T14:49:03.589Z",
+      "createdAt": "2026-10-11T14:49:03.590Z",
+      "updatedAt": "2026-10-11T14:49:03.590Z",
+      "__v": 0
+    },
+    {
+      "_id": "6acba1dfcfbd0b4fe30b359e",
+      "expenseId": "EXP_GOA_002",
+      "groupId": "GRP_GOA_2026",
+      "title": "Fisherman's Wharf Dinner",
+      "amount": 3600,
+      "category": "Food",
+      "payerId": "SATVIK01",
+      "payerName": "Satvik Patel",
+      "payerType": "registered",
+      "splitType": "equal",
+      "participants": [
+        "MAYUR01",
+        "SATVIK01",
+        "SHRIYA01"
+      ],
+      "shares": {
+        "MAYUR01": 1200,
+        "SATVIK01": 1200,
+        "SHRIYA01": 1200
+      },
+      "receiptUrl": null,
+      "receiptOriginalName": null,
+      "receiptMimeType": null,
+      "receiptSize": null,
+      "notes": "Crab masala and mocktails",
+      "date": "2026-10-11T14:49:03.592Z",
+      "createdAt": "2026-10-11T14:49:03.593Z",
+      "updatedAt": "2026-10-11T14:49:03.593Z",
+      "__v": 0
+    },
+    {
+      "_id": "6acba1dfcfbd0b4fe30b359f",
+      "expenseId": "EXP_GOA_003",
+      "groupId": "GRP_GOA_2026",
+      "title": "Grand Island Scuba Diving",
+      "amount": 9000,
+      "category": "Activities",
+      "payerId": "SHRIYA01",
+      "payerName": "Shriya Verma",
+      "payerType": "registered",
+      "splitType": "percentage",
+      "participants": [
+        "MAYUR01",
+        "SATVIK01",
+        "SHRIYA01"
+      ],
+      "shares": {
+        "MAYUR01": 3600,
+        "SATVIK01": 2700,
+        "SHRIYA01": 2700
+      },
+      "receiptUrl": null,
+      "receiptOriginalName": null,
+      "receiptMimeType": null,
+      "receiptSize": null,
+      "notes": "Includes underwater video footage",
+      "date": "2026-10-11T14:49:03.596Z",
+      "createdAt": "2026-10-11T14:49:03.596Z",
+      "updatedAt": "2026-10-11T14:49:03.596Z",
+      "__v": 0
+    }
+  ]
+}
