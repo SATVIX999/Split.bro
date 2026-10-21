@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Split Bro - Full API Testing Suite (Lectures 25-41)</title>
+    <style>
+        :root { --primary: #10b981; --accent: #38bdf8; --bg: #090d16; --card-bg: #131c2e; --border: #1e293b; --text: #f8fafc; --muted: #94a3b8; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 24px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 24px; }
+        h1 { margin: 0; font-size: 24px; color: var(--accent); }
+        .token-badge { background: #0f172a; padding: 6px 12px; border-radius: 20px; font-size: 13px; border: 1px solid var(--border); }
+        .token-active { border-color: var(--primary); color: var(--primary); }
+        .token-inactive { border-color: #ef4444; color: #f87171; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+        .card h2 { margin-top: 0; font-size: 16px; color: #e2e8f0; display: flex; align-items: center; justify-content: space-between; }
+        .method { font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+        .get { background: #0284c7; color: white; }
+        .post { background: #16a34a; color: white; }
+        .patch { background: #d97706; color: white; }
+        input, select, textarea { width: 100%; box-sizing: border-box; background: #090d16; border: 1px solid #334155; color: white; padding: 8px 12px; border-radius: 6px; margin-bottom: 10px; font-size: 13px; }
+        button { background: var(--primary); color: white; border: none; padding: 8px 14px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.15s; font-size: 13px; }
+        button:hover { opacity: 0.9; }
+        button.sec { background: #475569; }
+        pre { background: #050811; border: 1px solid #1e293b; padding: 12px; border-radius: 8px; color: #a5f3fc; font-size: 12px; max-height: 220px; overflow-y: auto; white-space: pre-wrap; word-break: break-all; }
+        .full-width { grid-column: span 2; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Split Bro &mdash; Live REST API Testing Dashboard</h1>
+                <p style="margin: 4px 0 0; color: var(--muted); font-size: 13px;">Demonstration Suite for Lectures 25&ndash;41 (Express &bull; Mongoose &bull; JWT &bull; Multer &bull; Settlement Algorithm)</p>
+            </div>
+            <div id="tokenBadge" class="token-badge token-inactive">JWT: Not Authenticated</div>
+        </div>
+
+        <div class="grid">
+            <!-- 1. AUTH API -->
+            <div class="card">
+                <h2>1. Authentication API <span class="method post">POST</span></h2>
+                <div style="display:flex; gap: 8px; margin-bottom: 8px;">
+                    <button id="btnQuickLogin" style="flex:1;">Login (Mayur Mittal)</button>
+                    <button id="btnLogout" class="sec">Logout</button>
+                </div>
+                <div style="font-size: 12px; color: var(--muted); margin-bottom: 6px;">Or Register New User:</div>
+                <input type="text" id="regName" placeholder="Full Name" value="Rohan Verma">
+                <input type="text" id="regUserId" placeholder="User ID" value="ROHAN01">
+                <input type="email" id="regEmail" placeholder="Email" value="rohan@splitbro.com">
+                <input type="password" id="regPass" placeholder="Password" value="Password@123">
+                <button id="btnRegister">POST /api/auth/register</button>
+                <pre id="authOut">// Auth responses appear here...</pre>
+            </div>
+
+            <!-- 2. GROUPS API -->
+            <div class="card">
+                <h2>2. Groups API <span class="method get">GET</span> <span class="method post">POST</span></h2>
+                <button id="btnGetGroups">GET /api/groups</button>
+                <div style="margin-top: 10px; font-size: 12px; color: var(--muted);">Create Group:</div>
+                <input type="text" id="grpName" placeholder="Group Name" value="Shimla Expedition">
+                <input type="text" id="grpMembers" placeholder="Member IDs (comma separated)" value="SATVIK01, SHRIYA01">
+                <button id="btnCreateGroup">POST /api/groups</button>
+                <pre id="grpOut">// Groups response...</pre>
+            </div>
+
+            <!-- 3. EXPENSES API -->
+            <div class="card">
+                <h2>3. Expenses API <span class="method post">POST</span> <span class="method get">GET</span></h2>
+                <select id="expGroupSelect"><option value="">Select Group First (Click GET Groups)</option></select>
+                <input type="text" id="expTitle" placeholder="Title (e.g. Dinner Bill)" value="Cafe Coffee Day">
+                <input type="number" id="expAmount" placeholder="Amount (₹)" value="1200">
+                <select id="expCategory">
+                    <option value="Food">Food</option>
+                    <option value="Transport">Transport</option>
+                    <option value="Hotel">Hotel</option>
+                    <option value="Activities">Activities</option>
+                    <option value="Shopping">Shopping</option>
+                    <option value="Other">Other</option>
+                </select>
+                <button id="btnAddExpense">POST /api/expenses</button>
+                <button id="btnGetExpenses" class="sec">GET /api/expenses</button>
+                <pre id="expOut">// Expenses response...</pre>
+            </div>
+
+            <!-- 4. SETTLEMENTS & INSIGHTS -->
+            <div class="card">
+                <h2>4. Settlement & Debt Simplification <span class="method get">GET</span></h2>
+                <p style="font-size:12px; color:var(--muted); margin:0 0 10px;">Calculates minimum debt-settling transactions across participants using the simplification algorithm.</p>
+                <button id="btnGetSettlements">GET /api/settlements</button>
+                <button id="btnGetGroupInsights" class="sec">GET /api/insights/group/:id</button>
+                <pre id="setOut">// Settlement calculation response...</pre>
+            </div>
+
+            <!-- 5. SERVER HEALTH & V8 -->
+            <div class="card full-width">
+                <h2>5. System Diagnostics & V8 Heap Memory (Lecture 31 & 35) <span class="method get">GET</span></h2>
+                <button id="btnHealth" class="sec">GET /api/health</button>
+                <pre id="healthOut">// Server status and V8 heap statistics...</pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let token = localStorage.getItem('token') || '';
+        const tokenBadge = document.getElementById('tokenBadge');
+
+        function updateBadge() {
+            if (token) {
+                tokenBadge.className = 'token-badge token-active';
+                tokenBadge.textContent = 'JWT Active (Authorized)';
+            } else {
+                tokenBadge.className = 'token-badge token-inactive';
+                tokenBadge.textContent = 'JWT Missing (Requests will return 401)';
+            }
+        }
+        updateBadge();
+
+        function getHeaders(isJson = true) {
+            const h = {};
+            if (isJson) h['Content-Type'] = 'application/json';
+            if (token) h['Authorization'] = 'Bearer ' + token;
+            return h;
+        }
+
+        // Quick Login
+        document.getElementById('btnQuickLogin').onclick = async () => {
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ identifier: 'mayur@example.com', password: 'Password@123' })
+                });
+                const d = await res.json();
+                document.getElementById('authOut').textContent = JSON.stringify(d, null, 2);
+                if (d.token) {
+                    token = d.token;
+                    localStorage.setItem('token', token);
+                    updateBadge();
+                }
+            } catch (e) { document.getElementById('authOut').textContent = e.message; }
+        };
+
+        // Logout
+        document.getElementById('btnLogout').onclick = () => {
+            token = '';
+            localStorage.removeItem('token');
+            updateBadge();
+            document.getElementById('authOut').textContent = 'Logged out. Token cleared.';
+        };
+
+        // Register
+        document.getElementById('btnRegister').onclick = async () => {
+            try {
+                const res = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: document.getElementById('regName').value,
+                        userId: document.getElementById('regUserId').value,
+                        email: document.getElementById('regEmail').value,
+                        password: document.getElementById('regPass').value
+                    })
+                });
+                const d = await res.json();
+                document.getElementById('authOut').textContent = JSON.stringify(d, null, 2);
+                if (d.token) {
+                    token = d.token;
+                    localStorage.setItem('token', token);
+                    updateBadge();
+                }
+            } catch (e) { document.getElementById('authOut').textContent = e.message; }
+        };
+
+        // Get Groups
+        document.getElementById('btnGetGroups').onclick = async () => {
+            try {
+                const res = await fetch('/api/groups', { headers: getHeaders() });
+                const d = await res.json();
+                document.getElementById('grpOut').textContent = JSON.stringify(d, null, 2);
+
+                const select = document.getElementById('expGroupSelect');
+                select.innerHTML = '';
+                if (Array.isArray(d)) {
+                    d.forEach(g => {
+                        const opt = document.createElement('option');
+                        opt.value = g.groupId;
+                        opt.textContent = `${g.groupName} (${g.groupId})`;
+                        select.appendChild(opt);
+                    });
+                }
+            } catch (e) { document.getElementById('grpOut').textContent = e.message; }
+        };
+
+        // Create Group
+        document.getElementById('btnCreateGroup').onclick = async () => {
+            try {
+                const members = document.getElementById('grpMembers').value.split(',').map(s=>s.trim()).filter(Boolean);
+                const res = await fetch('/api/groups', {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify({ groupName: document.getElementById('grpName').value, members })
+                });
+                const d = await res.json();
+                document.getElementById('grpOut').textContent = JSON.stringify(d, null, 2);
+                document.getElementById('btnGetGroups').click();
+            } catch (e) { document.getElementById('grpOut').textContent = e.message; }
+        };
+
+        // Add Expense
+        document.getElementById('btnAddExpense').onclick = async () => {
+            const groupId = document.getElementById('expGroupSelect').value;
+            if (!groupId) return alert('Select or load a group first');
+            try {
+                const res = await fetch('/api/expenses', {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify({
+                        groupId: groupId,
+                        title: document.getElementById('expTitle').value,
+                        amount: Number(document.getElementById('expAmount').value),
+                        category: document.getElementById('expCategory').value,
+                        splitType: 'equal'
+                    })
+                });
+                const d = await res.json();
+                document.getElementById('expOut').textContent = JSON.stringify(d, null, 2);
+            } catch (e) { document.getElementById('expOut').textContent = e.message; }
+        };
+
+        // Get Expenses
+        document.getElementById('btnGetExpenses').onclick = async () => {
+            const groupId = document.getElementById('expGroupSelect').value;
+            const url = groupId ? `/api/expenses?groupId=${groupId}` : '/api/expenses';
+            try {
+                const res = await fetch(url, { headers: getHeaders() });
+                const d = await res.json();
+                document.getElementById('expOut').textContent = JSON.stringify(d, null, 2);
+            } catch (e) { document.getElementById('expOut').textContent = e.message; }
+        };
+
+        // Settlements
+        document.getElementById('btnGetSettlements').onclick = async () => {
+            const groupId = document.getElementById('expGroupSelect').value;
+            const url = groupId ? `/api/settlements?groupId=${groupId}` : '/api/settlements';
+            try {
+                const res = await fetch(url, { headers: getHeaders() });
+                const d = await res.json();
+                document.getElementById('setOut').textContent = JSON.stringify(d, null, 2);
+            } catch (e) { document.getElementById('setOut').textContent = e.message; }
+        };
+
+        // Insights
+        document.getElementById('btnGetGroupInsights').onclick = async () => {
+            const groupId = document.getElementById('expGroupSelect').value;
+            if (!groupId) return alert('Select a group first from the Expenses card dropdown!');
+            try {
+                const res = await fetch(`/api/insights/group/${groupId}`, { headers: getHeaders() });
+                const d = await res.json();
+                document.getElementById('setOut').textContent = JSON.stringify(d, null, 2);
+            } catch (e) { document.getElementById('setOut').textContent = e.message; }
+        };
+
+        // Health
+        document.getElementById('btnHealth').onclick = async () => {
+            try {
+                const res = await fetch('/api/health');
+                const d = await res.json();
+                document.getElementById('healthOut').textContent = JSON.stringify(d, null, 2);
+            } catch (e) { document.getElementById('healthOut').textContent = e.message; }
+        };
+    </script>
+</body>
+</html>
