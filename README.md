@@ -1,103 +1,110 @@
-# Split-Bro
-[split-bro.etli](https://split-bro.netlify.app/dashboard)
-working link for our website
-A project on expenditure settlement
-# 💰 Split Bro — Smart Expense Sharing & Settlement System
+# Split Bro — Shared Expense Management & Debt Simplification Platform
 
-## 📌 Overview
-Split Bro is a web-based application designed to simplify shared expense management. It helps users create groups, add and split expenses, track balances, and settle payments efficiently.
+> **Split Smarter. Settle Faster.**  
 
-## ✨ Features
-- 🔐 User Signup and Login
-- 👥 Create and Manage Groups
-- ➕ Add and Split Expenses
-- 💰 Track Individual Balances
-- 🤝 Add Registered and Guest Members
-- 🔄 Smart Settlement Suggestions
-- 📊 Expense History and Insights
-- 🎯 Unique Group Codes for Joining Groups
-- 👤 User Profile Management
+---
 
-
-   ## 🔄 Application Flow
+## 1. Project Architecture
 
 ```text
-START / HOME
-     │
-     ▼
-Is User Logged In?
-     │
- ┌───┴───┐
- No      Yes
- │        │
- ▼        ▼
-Login /   Dashboard
-Sign Up      │
- │           │
- └─────┬─────┘
-       ▼
-Create / Join Group
-       │
-       ▼
-Add Members & Expenses
-       │
-       ▼
-Calculate Balances
-       │
-       ▼
-Smart Settlement
-       │
-       ▼
-View History & Insights
-       │
-       ▼
-      END ✓
+Split Bro/
+├── assets/                     # SVG brand assets and category icons
+├── css/                        # Stylesheets for Vanilla JS pages (Lectures 1–30)
+├── js/                         # Vanilla JS DOM, Storage, Fetch API & Form modules (Lectures 1–30)
+│   ├── app.js                  # Shared UI navigation & initialization
+│   ├── auth.js                 # Login & Registration DOM + API integration
+│   ├── dashboard.js            # Dashboard metrics & recent activity rendering
+│   ├── expense.js              # Expense form validation & split calculation
+│   ├── groups.js               # Group creation, invite codes & member management
+│   ├── history.js              # Expense history filtering & CSV export
+│   ├── insights.js             # Category breakdown & spending analytics
+│   ├── profile.js              # User profile & UPI ID management
+│   ├── settlement.js           # Debt simplification & settlement recording
+│   └── storage.js              # localStorage, sessionStorage & Fetch API wrapper
+│
+│   ├── src/
+│   │   ├── components/         # Reusable Functional Components (Navbar, Footer, Card, Button, Alert)
+│   │   ├── context/            # State & Auth persistence (AuthContext)
+│   │   ├── pages/              # Controlled Forms, Props & useState views
+│   │   └── utils/              # Currency/date formatters & storage helpers
+│   ├── index.html              # SPA HTML entry point
+│   └── vite.config.js          # Vite bundler & API proxy configuration
+│
+├── server/                     # Node.js, HTTP, Express.js & MongoDB Backend (Lectures 31–41)
+│   ├── src/
+│   │   ├── config/             # dotenv configuration & Mongoose connection
+│   │   ├── controllers/        # CRUD REST API controllers (Auth, Groups, Expenses, Settlements, Insights, Users)
+│   │   ├── middleware/         # JWT protect guard, express-validator, Multer upload, centralized errorHandler
+│   │   ├── models/             # Mongoose Schemas, Models, Validation & Populate (User, Group, Expense, Settlement)
+│   │   ├── routes/             # Express Router modules
+│   │   ├── services/           # Share calculation & greedy debt simplification services
+│   │   └── utils/              # AppError, EventEmitter (eventEmitter.js), Transform Stream (csvExporter.js)
+│   ├── tests/                  # Automated Jest & Supertest unit + integration suites
+│   └── uploads/receipts/       # Protected receipt upload storage
+│
+├── docs/                       # Course Syllabus Alignment & Postman Collection
+│   ├── COURSE_ALIGNMENT.md     # Exact Lecture 1–48 Syllabus Alignment Matrix
+│   ├── PROJECT_COMPLETION_REPORT.md # Audit & Verification Report
+│   ├── AUTHENTICATION.md       # JWT & bcrypt security architecture
+│   ├── ASYNC_JAVASCRIPT.md     # Callbacks, Promises, Async/Await & Event Loop guide
+│   ├── POSTMAN_TESTING.md      # Postman API testing guide
+│   └── postman/                # Split_Bro.postman_collection.json & environment
+│
+├── server.js                   # Main Node.js server entrypoint
+├── package.json                # NPM scripts & dependencies
+└── .env.example                # Environment variables template
 ```
 
-## 🛠️ Technology Stack
-- HTML5
-- CSS3
-- JavaScript
-- LocalStorage
+---
 
-## ⚙️ How It Works
-Users can create an account and form groups with other members. Expenses can be added and divided among group members. The application calculates balances to determine who owes money and who should receive it, helping users settle expenses with fewer transactions.
+## 2. Quick Start & Execution Guide
 
-## 🔐 Authentication
-Split Bro provides Login and Signup functionality to manage user accounts. User session information is maintained using browser LocalStorage.
+### 2.1 Prerequisites
+- **Node.js** (v18+ or v20+)
+- **MongoDB** running locally on `mongodb://127.0.0.1:27017/splitbro` (or MongoDB Atlas URI in `.env`)
 
-## 🤝 Smart Settlement
-The system calculates each member's balance based on their expenses and payments. Members with negative balances pay members with positive balances, helping simplify the settlement process.
+### 2.2 Install Dependencies
+```bash
+# Install backend & test dependencies
+npm install
 
-## 📂 Main Modules
-- Authentication
-- Group Management
-- Expense Management
-- Dashboard
-- Settlement
-- Expense History
-- Insights and Analytics
-- User Profile
+```
 
-## 👨‍💻 Team Members
-- **Satvik Sharma** — 2410992972
-- **Shriya Kathuria** — 2410992888
-- **Mayur Mittal** — 2410993231
+### 2.3 Configure Environment Variables
+Copy `.env.example` to `.env` (already pre-configured for local development):
+```env
+PORT=3000
+NODE_ENV=development
+MONGO_URI=mongodb://127.0.0.1:27017/splitbro
+JWT_SECRET=splitbro_super_secure_jwt_secret_dev_key_2026
+JWT_EXPIRES_IN=7d
+MAX_FILE_SIZE=5242880
+```
 
-- A quick look on our website
-- <img width="1892" height="912" alt="image" src="https://github.com/user-attachments/assets/f2ae6167-96d9-46ff-a8f2-df1f314049d7" />
-- <img width="1551" height="762" alt="image" src="https://github.com/user-attachments/assets/412e838c-3f11-4a08-8f82-d2ff48d10980" />
-- <img width="1527" height="816" alt="image" src="https://github.com/user-attachments/assets/1940a900-d10f-4a07-a75e-e77914bc585c" />
-- <img width="1547" height="741" alt="image" src="https://github.com/user-attachments/assets/92bd17ff-86d7-4708-a9e3-ceec2cf20434" />
-- <img width="1502" height="633" alt="image" src="https://github.com/user-attachments/assets/df9d2237-36f1-44e7-b8b5-72dbaae7dbb6" />
-- <img width="1552" height="755" alt="image" src="https://github.com/user-attachments/assets/acd5170c-7cb2-45ad-a436-9f92417ca350" />
-- <img width="725" height="761" alt="image" src="https://github.com/user-attachments/assets/e19534bf-783d-43b2-bb86-f1c4e21593cb" />
-- <img width="1525" height="766" alt="image" src="https://github.com/user-attachments/assets/22aaca11-09bc-407b-9599-17b05738294a" />
-- <img width="1555" height="732" alt="image" src="https://github.com/user-attachments/assets/f0023937-68d9-4d4a-9fae-349978fb90e0" />
-- <img width="1562" height="752" alt="image" src="https://github.com/user-attachments/assets/e5c6cc2b-43f6-4d9d-a57b-711ae0905e74" />
-- <img width="1545" height="745" alt="image" src="https://github.com/user-attachments/assets/e6e716d9-9bc7-4691-9771-500a7f73ea55" />
-- <img width="1558" height="655" alt="image" src="https://github.com/user-attachments/assets/f4ac9cbb-c214-4dd4-9f25-9a8a756fab61" />
-- <img width="408" height="472" alt="image" src="https://github.com/user-attachments/assets/819b3abc-143e-4a7f-8c41-532e4077cb16" />
-- <img width="1523" height="807" alt="image" src="https://github.com/user-attachments/assets/62e10f4a-cd32-4e15-a761-1b3365294b32" />
-- <img width="1523" height="805" alt="image" src="https://github.com/user-attachments/assets/1fadc803-1423-4caf-b60c-4774f3361130" />
-- <img width="1397" height="823" alt="image" src="https://github.com/user-attachments/assets/7538f4ef-9899-44c6-8173-fb1095eb827d" />
+### 2.4 Seed Sample Data (Optional)
+```bash
+npm run seed
+```
+
+### 2.5 Run the Application
+- **Start Backend Server (Express + Node HTTP + Static Vanilla JS Pages on Port 3000):**
+  ```bash
+  npm start
+  # Or with Nodemon auto-reload:
+  npm run dev
+  ```
+  - Backend API & Vanilla JS App: `http://localhost:3000`
+  - Health & V8 Runtime Check: `http://localhost:3000/api/health`
+
+  ```bash
+  ```
+
+---
+
+## 3. Verification & Testing Commands
+
+```bash
+# Run all 60 automated unit and integration tests
+npm test
+
+```

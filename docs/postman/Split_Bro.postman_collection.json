@@ -1,0 +1,502 @@
+{
+  "info": {
+    "_postman_id": "split-bro-api-v2-collection",
+    "name": "Split Bro REST API Suite",
+    "description": "Comprehensive Postman Collection for Split Bro Shared Expense & Debt Simplification Platform.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. System Health",
+      "item": [
+        {
+          "name": "API Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "health"]
+            }
+          }
+        },
+        {
+          "name": "API Welcome Root",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": ["{{baseUrl}}"],
+              "path": [""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.token) {",
+                  "    pm.environment.set('token', jsonData.token);",
+                  "    pm.environment.set('userId', jsonData.user.userId);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Mayur Sharma\",\n  \"email\": \"mayur@example.com\",\n  \"userId\": \"MAYUR01\",\n  \"password\": \"Password@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.token) {",
+                  "    pm.environment.set('token', jsonData.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"mayur@example.com\",\n  \"password\": \"Password@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Authenticated Profile (Me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "me"]
+            }
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bio\": \"Senior explorer & budget master\",\n  \"upiId\": \"mayur@upi\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Groups",
+      "item": [
+        {
+          "name": "Create Group",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.group && jsonData.group.groupId) {",
+                  "    pm.environment.set('groupId', jsonData.group.groupId);",
+                  "    pm.environment.set('groupCode', jsonData.group.groupCode);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"groupName\": \"Manali Winter Expedition\",\n  \"category\": \"Trip\",\n  \"description\": \"Cabin rental and skiing\",\n  \"members\": [\"SATVIK01\", \"SHRIYA01\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/groups",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "groups"]
+            }
+          }
+        },
+        {
+          "name": "Get User Groups",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/groups",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "groups"]
+            }
+          }
+        },
+        {
+          "name": "Get Group by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/groups/{{groupId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "groups", "{{groupId}}"]
+            }
+          }
+        },
+        {
+          "name": "Join Group by Code",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"groupCode\": \"{{groupCode}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/groups/join",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "groups", "join"]
+            }
+          }
+        },
+        {
+          "name": "Add Guest Member",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Guest Friend John\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/groups/{{groupId}}/members/guest",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "groups", "{{groupId}}", "members", "guest"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Expenses",
+      "item": [
+        {
+          "name": "Record Expense (Equal Split)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.expense && jsonData.expense.expenseId) {",
+                  "    pm.environment.set('expenseId', jsonData.expense.expenseId);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"groupId\": \"{{groupId}}\",\n  \"title\": \"Resort Dinner & Drinks\",\n  \"amount\": 3600,\n  \"category\": \"Food\",\n  \"payerId\": \"MAYUR01\",\n  \"splitType\": \"equal\",\n  \"participants\": [\"MAYUR01\", \"SATVIK01\", \"SHRIYA01\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/expenses",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "expenses"]
+            }
+          }
+        },
+        {
+          "name": "Get Group Expenses",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/expenses?groupId={{groupId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "expenses"],
+              "query": [
+                {
+                  "key": "groupId",
+                  "value": "{{groupId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Export Expenses as Streaming CSV",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/expenses/export/csv?groupId={{groupId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "expenses", "export", "csv"],
+              "query": [
+                {
+                  "key": "groupId",
+                  "value": "{{groupId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Secure Expense Receipt",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/expenses/receipts/{{receiptFilename}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "expenses", "receipts", "{{receiptFilename}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Settlements",
+      "item": [
+        {
+          "name": "Get Balances & Debt Simplification Suggestions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/settlements/balances/{{groupId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "settlements", "balances", "{{groupId}}"]
+            }
+          }
+        },
+        {
+          "name": "Record Settlement Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"groupId\": \"{{groupId}}\",\n  \"from\": \"SATVIK01\",\n  \"to\": \"MAYUR01\",\n  \"amount\": 1200,\n  \"paymentMethod\": \"UPI\",\n  \"notes\": \"Transferred via GooglePay\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/settlements",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "settlements"]
+            }
+          }
+        },
+        {
+          "name": "Get Group Settlements History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/settlements?groupId={{groupId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "settlements"],
+              "query": [
+                {
+                  "key": "groupId",
+                  "value": "{{groupId}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Analytics & Insights",
+      "item": [
+        {
+          "name": "Get Group Insights",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/insights/group/{{groupId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "insights", "group", "{{groupId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get User Financial Overview",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/insights/user",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "insights", "user"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
