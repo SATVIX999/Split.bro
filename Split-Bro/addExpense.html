@@ -204,16 +204,16 @@
     </section>
 
 
-    <section class="expense-layout" style="display:grid; grid-template-columns:1.15fr 1fr; gap:26px; align-items:start;">
+    <section class="expense-layout" style="display:block; max-width:960px; margin:0 auto;">
 
-        <!-- LEFT COLUMN: EXPENSE FORM -->
-        <div class="expense-form-card">
+        <div class="expense-form-card" style="width:100%; box-sizing:border-box; padding:36px; border-radius:24px; background:rgba(10,20,39,0.85); border:1px solid rgba(255,255,255,0.08); box-shadow:0 20px 60px rgba(0,0,0,0.25);">
 
             <form id="expenseForm">
 
-                <div class="expense-field">
-                    <label for="expenseGroupSelect">
-                        <i class="fa-solid fa-users" style="color:#38bdf8;margin-right:6px;"></i> Select Group
+                <!-- 1. GROUP SELECTION -->
+                <div class="expense-field" style="margin-bottom:24px;">
+                    <label for="expenseGroupSelect" style="font-size:12px; font-weight:600; color:#cbd5e1; margin-bottom:8px; display:block;">
+                        <i class="fa-solid fa-users" style="color:#38bdf8; margin-right:6px;"></i> Select Group
                     </label>
                     <div class="expense-input">
                         <i class="fa-solid fa-layer-group"></i>
@@ -224,21 +224,79 @@
                     <span class="expense-error" id="groupError"></span>
                 </div>
 
-                <div class="expense-field">
-                    <label for="expenseTitle">
-                        <i class="fa-solid fa-pen" style="color:#38bdf8;margin-right:6px;"></i> Expense Name
+                <!-- 2. BILL / RECEIPT PHOTO SCANNER (MULTER & LIVE OCR) -->
+                <div class="expense-field receipt-upload-field" style="margin-bottom:28px;">
+                    <label style="font-size:12px; font-weight:600; color:#cbd5e1; margin-bottom:8px; display:flex; align-items:center; justify-content:space-between;">
+                        <span>
+                            <i class="fa-solid fa-camera" style="color:#10b981; margin-right:6px;"></i> Bill / Receipt Photo (Multer Upload &amp; OCR Data Extraction)
+                        </span>
+                        <span class="section-tag" style="margin:0; font-size:10px; color:#10b981; background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); padding:2px 8px; border-radius:12px;">
+                            LECTURES 39 &amp; 40
+                        </span>
+                    </label>
+
+                    <div class="receipt-drop-box" id="receiptDropZone" style="border:2px dashed rgba(56,189,248,0.4); background:rgba(15,23,42,0.6); border-radius:16px; padding:24px; text-align:center; cursor:pointer; transition:all 0.2s ease;">
+                        <input type="file" id="receiptFileInput" name="receipt" accept="image/jpeg,image/png,image/webp,application/pdf" style="display:none;">
+
+                        <div class="drop-content" id="dropContent">
+                            <div class="drop-icon" style="font-size:36px; color:#38bdf8; margin-bottom:10px;">
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                            </div>
+                            <h4 style="font-size:15px; margin:0 0 6px; color:#f8fafc; font-weight:600;">
+                                Click or Drag &amp; Drop Bill / Receipt Photo
+                            </h4>
+                            <p style="font-size:12px; margin:0 0 14px; color:#94a3b8;">
+                                Upload bill (JPG, PNG, WEBP) &bull; Automatically extracts total amount, merchant name, category, and date
+                            </p>
+                            <button type="button" class="btn-browse-photo" id="btnBrowseReceipt" style="background:#0284c7; color:#fff; border:none; padding:9px 20px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:8px;">
+                                <i class="fa-solid fa-image"></i> Browse Receipt Photo
+                            </button>
+                        </div>
+
+                        <div class="receipt-preview-box" id="receiptPreviewBox" style="display:none; align-items:center; gap:18px; text-align:left; background:rgba(30,41,59,0.7); padding:16px; border-radius:12px;">
+                            <div class="preview-img-wrap" style="width:85px; height:85px; border-radius:10px; overflow:hidden; background:#090d16; border:1px solid rgba(255,255,255,0.1); flex-shrink:0;">
+                                <img id="receiptImagePreview" alt="Receipt preview" style="width:100%; height:100%; object-fit:cover;">
+                            </div>
+                            <div class="preview-meta" style="flex:1; display:flex; flex-direction:column; gap:5px;">
+                                <strong id="receiptFileName" style="color:#f8fafc; font-size:14px;">receipt.jpg</strong>
+                                <span id="receiptFileSize" style="color:#94a3b8; font-size:12px;">0 KB</span>
+                                <div class="ocr-badge" id="ocrStatusBadge" style="display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:14px; font-size:11px; font-weight:600; background:rgba(16,185,129,0.15); color:#34d399; width:fit-content;">
+                                    <i class="fa-solid fa-sparkles"></i> Ready to scan
+                                </div>
+                                <button type="button" class="btn-remove-receipt" id="btnRemoveReceipt" style="background:none; border:none; color:#f87171; font-size:12px; cursor:pointer; padding:0; margin-top:4px; text-align:left; display:inline-flex; align-items:center; gap:6px;">
+                                    <i class="fa-solid fa-trash-can"></i> Remove Photo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="extracted-alert" id="extractedAlert" style="display:none; margin-top:12px; padding:12px 16px; border-radius:10px; background:rgba(16,185,129,0.15); border:1px solid #10b981; color:#a7f3d0; font-size:13px; align-items:center; gap:10px;">
+                        <i class="fa-solid fa-wand-magic-sparkles" style="font-size:16px; color:#10b981;"></i>
+                        <span id="extractedAlertText">Extracted from photo! Auto-filled fields below.</span>
+                    </div>
+
+                    <div style="margin-top:10px; font-size:11px; color:#64748b; display:flex; align-items:center; gap:6px;">
+                        <i class="fa-solid fa-circle-info" style="color:#38bdf8;"></i> Uploaded photos are transmitted via Multer <code>multipart/form-data</code> and saved into <code>server/uploads/receipts/</code>.
+                    </div>
+                </div>
+
+                <!-- 3. EXPENSE NAME -->
+                <div class="expense-field" style="margin-bottom:24px;">
+                    <label for="expenseTitle" style="font-size:12px; font-weight:600; color:#cbd5e1; margin-bottom:8px; display:block;">
+                        <i class="fa-solid fa-pen" style="color:#38bdf8; margin-right:6px;"></i> Expense Name
                     </label>
                     <div class="expense-input">
                         <i class="fa-solid fa-pen"></i>
-                        <input type="text" id="expenseTitle" placeholder="Example: Dinner at Cafe" autocomplete="off">
+                        <input type="text" id="expenseTitle" placeholder="Example: Dinner at Cafe Coffee Day" autocomplete="off">
                     </div>
                     <span class="expense-error" id="titleError"></span>
                 </div>
 
-                <div class="expense-two-columns">
-                    <div class="expense-field">
-                        <label for="expenseAmount">
-                            <i class="fa-solid fa-indian-rupee-sign" style="color:#10b981;margin-right:6px;"></i> Amount
+                <!-- 4. AMOUNT & CATEGORY -->
+                <div class="expense-two-columns" style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:24px;">
+                    <div class="expense-field" style="margin-bottom:0;">
+                        <label for="expenseAmount" style="font-size:12px; font-weight:600; color:#cbd5e1; margin-bottom:8px; display:block;">
+                            <i class="fa-solid fa-indian-rupee-sign" style="color:#10b981; margin-right:6px;"></i> Amount
                         </label>
                         <div class="expense-input">
                             <i class="fa-solid fa-indian-rupee-sign"></i>
@@ -247,9 +305,9 @@
                         <span class="expense-error" id="amountError"></span>
                     </div>
 
-                    <div class="expense-field">
-                        <label for="expenseCategory">
-                            <i class="fa-solid fa-layer-group" style="color:#38bdf8;margin-right:6px;"></i> Category
+                    <div class="expense-field" style="margin-bottom:0;">
+                        <label for="expenseCategory" style="font-size:12px; font-weight:600; color:#cbd5e1; margin-bottom:8px; display:block;">
+                            <i class="fa-solid fa-layer-group" style="color:#38bdf8; margin-right:6px;"></i> Category
                         </label>
                         <div class="expense-input">
                             <i class="fa-solid fa-layer-group"></i>
@@ -267,10 +325,11 @@
                     </div>
                 </div>
 
-                <div class="expense-two-columns">
-                    <div class="expense-field">
-                        <label for="expenseDate">
-                            <i class="fa-solid fa-calendar-days" style="color:#38bdf8;margin-right:6px;"></i> Expense Date
+                <!-- 5. DATE & PAID BY -->
+                <div class="expense-two-columns" style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:24px;">
+                    <div class="expense-field" style="margin-bottom:0;">
+                        <label for="expenseDate" style="font-size:12px; font-weight:600; color:#cbd5e1; margin-bottom:8px; display:block;">
+                            <i class="fa-solid fa-calendar-days" style="color:#38bdf8; margin-right:6px;"></i> Expense Date
                         </label>
                         <div class="expense-input">
                             <i class="fa-solid fa-calendar-days"></i>
@@ -278,9 +337,9 @@
                         </div>
                     </div>
 
-                    <div class="expense-field">
-                        <label for="expensePayer">
-                            <i class="fa-solid fa-user" style="color:#38bdf8;margin-right:6px;"></i> Paid By
+                    <div class="expense-field" style="margin-bottom:0;">
+                        <label for="expensePayer" style="font-size:12px; font-weight:600; color:#cbd5e1; margin-bottom:8px; display:block;">
+                            <i class="fa-solid fa-user" style="color:#38bdf8; margin-right:6px;"></i> Paid By
                         </label>
                         <div class="expense-input">
                             <i class="fa-solid fa-user"></i>
@@ -290,22 +349,24 @@
                     </div>
                 </div>
 
-                <div class="split-section">
-                    <div class="split-heading">
+                <!-- 6. SPLIT AMONG MEMBERS -->
+                <div class="split-section" style="margin-bottom:24px;">
+                    <div class="split-heading" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
                         <div>
-                            <h2>Split Among</h2>
-                            <p>Select the members sharing this expense.</p>
+                            <h2 style="font-size:16px; margin:0 0 4px; color:#f8fafc;">Split Among</h2>
+                            <p style="font-size:12px; color:#94a3b8; margin:0;">Select the members sharing this expense.</p>
                         </div>
-                        <button type="button" id="selectAllMembers">Select All</button>
+                        <button type="button" id="selectAllMembers" style="background:rgba(56,189,248,0.15); color:#38bdf8; border:1px solid rgba(56,189,248,0.3); padding:6px 14px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;">Select All</button>
                     </div>
 
                     <div id="splitMembers" class="split-members"></div>
                     <span class="expense-error" id="membersError"></span>
                 </div>
 
-                <div class="split-type-section">
-                    <h2>Split Type</h2>
-                    <div class="split-type-options">
+                <!-- 7. SPLIT TYPE (Equal, %, Custom) -->
+                <div class="split-type-section" style="margin-bottom:24px;">
+                    <h2 style="font-size:16px; margin:0 0 12px; color:#f8fafc;">Split Type</h2>
+                    <div class="split-type-options" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px;">
                         <label class="split-option">
                             <input type="radio" name="splitType" value="equal" checked>
                             <span><i class="fa-solid fa-equals"></i> Equal</span>
@@ -323,103 +384,22 @@
 
                 <div id="splitValues" class="split-values"></div>
 
-                <div id="splitSummary" class="split-summary">
+                <div id="splitSummary" class="split-summary" style="margin-top:16px; margin-bottom:24px;">
                     <span>Your split</span>
                     <strong>₹0.00</strong>
                 </div>
 
                 <span class="expense-error form-error" id="formError"></span>
 
-                <div class="expense-actions">
-                    <a href="dashboard.html" class="expense-cancel">Cancel</a>
-                    <button type="submit" class="expense-submit">
+                <!-- 8. ACTION BUTTONS -->
+                <div class="expense-actions" style="display:flex; justify-content:flex-end; gap:14px; margin-top:20px;">
+                    <a href="dashboard.html" class="expense-cancel" style="padding:12px 24px; border-radius:8px; text-decoration:none; color:#94a3b8; font-size:13px; font-weight:600;">Cancel</a>
+                    <button type="submit" class="expense-submit" style="padding:12px 28px; border-radius:8px; font-size:14px; font-weight:600; background:#0284c7; color:#fff; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:8px;">
                         <i class="fa-solid fa-check"></i> Add Expense
                     </button>
                 </div>
 
             </form>
-
-        </div>
-
-        <!-- RIGHT COLUMN: RECEIPT SCANNER & PREVIEW (Direct Child of Grid) -->
-        <div class="expense-sidebar" style="display:flex; flex-direction:column; gap:20px;">
-
-            <!-- RECEIPT PHOTO SCANNER (MULTER & OCR) -->
-            <div class="expense-preview-card" style="padding:24px; border-radius:20px; background:rgba(10,20,39,0.85); border:1px solid rgba(255,255,255,0.08); box-shadow:0 20px 60px rgba(0,0,0,0.2);">
-                <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
-                    <div class="preview-icon" style="margin:0; width:42px; height:42px; font-size:18px; background:rgba(16,185,129,0.15); color:#10b981; display:flex; align-items:center; justify-content:center; border-radius:12px;">
-                        <i class="fa-solid fa-camera"></i>
-                    </div>
-                    <div>
-                        <span class="section-tag" style="margin:0; font-size:10px; color:#10b981;">MULTER UPLOAD &amp; OCR</span>
-                        <h3 style="margin:2px 0 0; color:#f8fafc; font-size:17px; font-weight:700;">Bill Photo Scanner</h3>
-                    </div>
-                </div>
-
-                <p style="font-size:12px; color:#94a3b8; margin:0 0 14px; line-height:1.5;">
-                    Upload a receipt or bill photo. Split Bro automatically extracts the total amount, store name, category, and date.
-                </p>
-
-                <div class="receipt-drop-box" id="receiptDropZone" style="border:2px dashed rgba(56,189,248,0.4); background:rgba(15,23,42,0.6); border-radius:14px; padding:20px; text-align:center; cursor:pointer;">
-                    <input type="file" id="receiptFileInput" name="receipt" accept="image/jpeg,image/png,image/webp,application/pdf" style="display:none;">
-                    <div class="drop-content" id="dropContent">
-                        <div class="drop-icon" style="font-size:32px; color:#38bdf8; margin-bottom:8px;"><i class="fa-solid fa-cloud-arrow-up"></i></div>
-                        <h4 style="font-size:14px; margin:0 0 4px; color:#f8fafc;">Click or Drag &amp; Drop Bill Photo</h4>
-                        <p style="font-size:11px; margin:0 0 12px; color:#94a3b8;">Supports JPG, PNG, WEBP &bull; Max 5MB</p>
-                        <button type="button" class="btn-browse-photo" id="btnBrowseReceipt" style="background:#0284c7; color:#fff; border:none; padding:8px 16px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer;">
-                            <i class="fa-solid fa-image"></i> Browse Receipt Photo
-                        </button>
-                    </div>
-
-                    <div class="receipt-preview-box" id="receiptPreviewBox" style="display:none; align-items:center; gap:14px; text-align:left; background:rgba(30,41,59,0.7); padding:12px; border-radius:10px;">
-                        <div class="preview-img-wrap" style="width:75px; height:75px; border-radius:8px; overflow:hidden; background:#090d16; border:1px solid rgba(255,255,255,0.1); flex-shrink:0;">
-                            <img id="receiptImagePreview" alt="Receipt preview" style="width:100%; height:100%; object-fit:cover;">
-                        </div>
-                        <div class="preview-meta" style="flex:1; display:flex; flex-direction:column; gap:4px;">
-                            <strong id="receiptFileName" style="color:#f8fafc; font-size:13px;">receipt.jpg</strong>
-                            <span id="receiptFileSize" style="color:#94a3b8; font-size:11px;">0 KB</span>
-                            <div class="ocr-badge" id="ocrStatusBadge" style="display:inline-flex; align-items:center; gap:5px; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:600; background:rgba(16,185,129,0.15); color:#34d399; width:fit-content;">
-                                <i class="fa-solid fa-sparkles"></i> Ready to scan
-                            </div>
-                            <button type="button" class="btn-remove-receipt" id="btnRemoveReceipt" style="background:none; border:none; color:#f87171; font-size:11px; cursor:pointer; padding:0; margin-top:2px; text-align:left;">
-                                <i class="fa-solid fa-trash-can"></i> Remove Photo
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="extracted-alert" id="extractedAlert" style="display:none; margin-top:12px; padding:10px 14px; border-radius:10px; background:rgba(16,185,129,0.15); border:1px solid #10b981; color:#a7f3d0; font-size:12px; align-items:center; gap:8px;">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i>
-                    <span id="extractedAlertText">Extracted from photo! Auto-filled amount &amp; merchant.</span>
-                </div>
-
-                <div style="margin-top:12px; padding:10px; border-radius:8px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.05); font-size:11px; color:#64748b;">
-                    <i class="fa-solid fa-circle-info" style="color:#38bdf8;"></i> Handled via Multer (multipart/form-data) and stored in <code>server/uploads/receipts/</code>.
-                </div>
-            </div>
-
-            <!-- INFO / SPLIT FEATURE CARD -->
-            <aside class="expense-preview-card" style="padding:24px; border-radius:20px; background:rgba(10,20,39,0.85); border:1px solid rgba(255,255,255,0.08);">
-                <div class="preview-icon" style="margin-bottom:12px; font-size:20px; color:#38bdf8;">
-                    <i class="fa-solid fa-receipt"></i>
-                </div>
-                <span class="section-tag" style="font-size:10px;">SPLIT BRO</span>
-                <h2 style="font-size:18px; margin:6px 0 8px; color:#f8fafc;">Make every expense count.</h2>
-                <p style="font-size:12px; color:#94a3b8; margin:0 0 16px; line-height:1.5;">Split Bro calculates everyone's share and uses it to generate the simplest settlement plan.</p>
-
-                <div class="preview-item" style="display:flex; align-items:center; gap:8px; margin-bottom:8px; font-size:12px; color:#cbd5e1;">
-                    <i class="fa-solid fa-circle-check" style="color:#10b981;"></i>
-                    <span>Fair splitting &bull; Equal, % &amp; Custom</span>
-                </div>
-                <div class="preview-item" style="display:flex; align-items:center; gap:8px; margin-bottom:8px; font-size:12px; color:#cbd5e1;">
-                    <i class="fa-solid fa-circle-check" style="color:#10b981;"></i>
-                    <span>Automatic receipt attachment</span>
-                </div>
-                <div class="preview-item" style="display:flex; align-items:center; gap:8px; font-size:12px; color:#cbd5e1;">
-                    <i class="fa-solid fa-circle-check" style="color:#10b981;"></i>
-                    <span>Greedy debt simplification</span>
-                </div>
-            </aside>
 
         </div>
 
