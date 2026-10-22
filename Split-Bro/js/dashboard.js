@@ -1,3 +1,9 @@
+function getApiUrl(endpoint) {
+    if (window.location && window.location.port === "3000") {
+        return endpoint;
+    }
+    return "http://localhost:3000" + endpoint;
+}
 // Split Bro - Enhanced Dashboard Controller connected to Express & MongoDB Atlas
 document.addEventListener("DOMContentLoaded", async function () {
     const token = localStorage.getItem("token") || "";
@@ -71,7 +77,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     // 1. Fetch Groups
     try {
         if (token) {
-            const res = await fetch("/api/groups", {
+            const res = await fetch(getApiUrl("/api/groups"), {
                 headers: { "Authorization": "Bearer " + token }
             });
             if (res.ok) {
@@ -101,7 +107,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (selectedGroup) {
         try {
             if (token) {
-                const res = await fetch(`/api/expenses?groupId=${selectedGroup.groupId}`, {
+                const res = await fetch(getApiUrl(`/api/expenses?groupId=${selectedGroup.groupId}`), {
                     headers: { "Authorization": "Bearer " + token }
                 });
                 if (res.ok) {
@@ -116,7 +122,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         // Fetch Settlements (Greedy Simplification Algorithm)
         try {
             if (token) {
-                const res = await fetch(`/api/settlements?groupId=${selectedGroup.groupId}`, {
+                const res = await fetch(getApiUrl(`/api/settlements?groupId=${selectedGroup.groupId}`), {
                     headers: { "Authorization": "Bearer " + token }
                 });
                 if (res.ok) {
@@ -308,7 +314,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             const diagHeapTotal = document.getElementById("diagHeapTotal");
 
             try {
-                const res = await fetch("/api/health");
+                const res = await fetch(getApiUrl("/api/health"));
                 const data = await res.json();
                 if (diagJson) diagJson.textContent = JSON.stringify(data, null, 2);
                 if (diagStatus) diagStatus.textContent = data.status === "ok" ? "Active (Online)" : "Degraded";

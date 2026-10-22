@@ -1,3 +1,9 @@
+function getApiUrl(endpoint) {
+    if (window.location && window.location.port === "3000") {
+        return endpoint;
+    }
+    return "http://localhost:3000" + endpoint;
+}
 // Split Bro - Add Expense Controller with Multer Upload & Smart Receipt Extraction
 let token = localStorage.getItem("token") || "";
 let currentUser = typeof getCurrentUser === "function" ? getCurrentUser() : JSON.parse(localStorage.getItem("smartSettleCurrentUser") || localStorage.getItem("currentUser") || "null");
@@ -78,7 +84,7 @@ function getMemberUserId(member) {
 async function loadGroups() {
     try {
         if (token) {
-            const res = await fetch("/api/groups", {
+            const res = await fetch(getApiUrl("/api/groups"), {
                 headers: { "Authorization": "Bearer " + token }
             });
             if (res.ok) {
@@ -330,7 +336,7 @@ async function extractReceiptData(file) {
         if (token) {
             const scanForm = new FormData();
             scanForm.append("receipt", file);
-            const scanRes = await fetch("/api/expenses/scan-receipt", {
+            const scanRes = await fetch(getApiUrl("/api/expenses/scan-receipt"), {
                 method: "POST",
                 headers: { "Authorization": "Bearer " + token },
                 body: scanForm
@@ -527,7 +533,7 @@ if (expenseForm) {
                     formData.append("receipt", currentReceiptFile);
                 }
 
-                const res = await fetch("/api/expenses", {
+                const res = await fetch(getApiUrl("/api/expenses"), {
                     method: "POST",
                     headers: { "Authorization": "Bearer " + token },
                     body: formData
