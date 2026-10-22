@@ -1886,7 +1886,6 @@ footer{
     }
 
     .group-layout,
-    .expense-layout,
     .dashboard-grid{
         grid-template-columns:1fr;
     }
