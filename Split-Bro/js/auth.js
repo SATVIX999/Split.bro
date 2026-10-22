@@ -180,13 +180,4 @@ let togglePassword = (inputId, button) => {
 let logoutUser = () => {
     removeCurrentUser();
     window.location.href = "login.html";
-};
-
-let existingUserId = users.some(user =>
-    user.userId.toLowerCase() === userId.toLowerCase()
-);
-
-if (existingUserId) {
-    userIdError.textContent = "This User ID is already taken.";
-    valid = false;
-}
+};

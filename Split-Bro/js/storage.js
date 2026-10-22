@@ -17,3 +17,19 @@ let saveCurrentUser = (user) => {
 let removeCurrentUser = () => {
     localStorage.removeItem("smartSettleCurrentUser");
 };
+
+let saveExpenseDraft = (draft) => {
+    sessionStorage.setItem("smartSettleExpenseDraft", JSON.stringify(draft));
+};
+
+let getExpenseDraft = () => {
+    try {
+        return JSON.parse(sessionStorage.getItem("smartSettleExpenseDraft")) || null;
+    } catch (e) {
+        return null;
+    }
+};
+
+let clearExpenseDraft = () => {
+    sessionStorage.removeItem("smartSettleExpenseDraft");
+};

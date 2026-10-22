@@ -1,4 +1,3 @@
-
 let currentUser = getCurrentUser();
 
 if (!currentUser) {

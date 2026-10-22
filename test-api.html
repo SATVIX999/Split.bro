@@ -47,10 +47,10 @@
                     <button id="btnLogout" class="sec">Logout</button>
                 </div>
                 <div style="font-size: 12px; color: var(--muted); margin-bottom: 6px;">Or Register New User:</div>
-                <input type="text" id="regName" placeholder="Full Name" value="Rohan Verma">
-                <input type="text" id="regUserId" placeholder="User ID" value="ROHAN01">
-                <input type="email" id="regEmail" placeholder="Email" value="rohan@splitbro.com">
-                <input type="password" id="regPass" placeholder="Password" value="Password@123">
+                <input type="text" id="regName" placeholder="Full Name" value="">
+                <input type="text" id="regUserId" placeholder="User ID" value="">
+                <input type="email" id="regEmail" placeholder="Email" value="">
+                <input type="password" id="regPass" placeholder="Password" value="">
                 <button id="btnRegister">POST /api/auth/register</button>
                 <pre id="authOut">// Auth responses appear here...</pre>
             </div>
@@ -60,8 +60,8 @@
                 <h2>2. Groups API <span class="method get">GET</span> <span class="method post">POST</span></h2>
                 <button id="btnGetGroups">GET /api/groups</button>
                 <div style="margin-top: 10px; font-size: 12px; color: var(--muted);">Create Group:</div>
-                <input type="text" id="grpName" placeholder="Group Name" value="Shimla Expedition">
-                <input type="text" id="grpMembers" placeholder="Member IDs (comma separated)" value="SATVIK01, SHRIYA01">
+                <input type="text" id="grpName" placeholder="Group Name" value="">
+                <input type="text" id="grpMembers" placeholder="Member IDs (comma separated)" value="">
                 <button id="btnCreateGroup">POST /api/groups</button>
                 <pre id="grpOut">// Groups response...</pre>
             </div>
@@ -70,8 +70,8 @@
             <div class="card">
                 <h2>3. Expenses API <span class="method post">POST</span> <span class="method get">GET</span></h2>
                 <select id="expGroupSelect"><option value="">Select Group First (Click GET Groups)</option></select>
-                <input type="text" id="expTitle" placeholder="Title (e.g. Dinner Bill)" value="Cafe Coffee Day">
-                <input type="number" id="expAmount" placeholder="Amount (₹)" value="1200">
+                <input type="text" id="expTitle" placeholder="Title (e.g. Dinner Bill)" value="">
+                <input type="number" id="expAmount" placeholder="Amount (₹)" value="">
                 <select id="expCategory">
                     <option value="Food">Food</option>
                     <option value="Transport">Transport</option>
@@ -274,3 +274,4 @@
     </script>
 </body>
 </html>
+

@@ -278,5 +278,3 @@ passwordForm.addEventListener("submit", (event) => {
     updatePasswordCheck(numberCheck, false);
     updatePasswordCheck(symbolCheck, false);
 });
-
-

@@ -7,148 +7,202 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
-    const users = getUsers();
+    let users = getUsers();
 
-    let groups =
-        JSON.parse(
-            localStorage.getItem("smartSettleGroups")
-        ) || [];
+    let groups = [];
 
-    let newMembers = [];
-    let editingGroupId = null;
+    const groupsContainer =
+        document.getElementById("groupsContainer");
 
-    const $ = id => document.getElementById(id);
+    const emptyGroups =
+        document.getElementById("emptyGroups");
 
-    const groupsContainer = $("groupsContainer");
-    const emptyGroups = $("emptyGroups");
+    const openGroupModal =
+        document.getElementById("openGroupModal");
 
-    const openGroupModal = $("openGroupModal");
-    const openJoinGroup = $("openJoinGroup");
-    const emptyCreateGroup = $("emptyCreateGroup");
-    const emptyJoinGroup = $("emptyJoinGroup");
+    const openJoinGroup =
+        document.getElementById("openJoinGroup");
 
-    const createGroupModal = $("createGroupModal");
-    const joinGroupModal = $("joinGroupModal");
-    const editGroupModal = $("editGroupModal");
+    const emptyCreateGroup =
+        document.getElementById("emptyCreateGroup");
 
-    const closeCreateModal = $("closeCreateModal");
-    const closeJoinModal = $("closeJoinModal");
-    const closeEditModal = $("closeEditModal");
+    const emptyJoinGroup =
+        document.getElementById("emptyJoinGroup");
 
-    const cancelCreateGroup = $("cancelCreateGroup");
-    const cancelJoinGroup = $("cancelJoinGroup");
-    const cancelEditGroup = $("cancelEditGroup");
+    const createGroupModal =
+        document.getElementById("createGroupModal");
 
-    const groupForm = $("groupForm");
-    const joinGroupForm = $("joinGroupForm");
-    const editGroupForm = $("editGroupForm");
+    const joinGroupModal =
+        document.getElementById("joinGroupModal");
 
-    const groupName = $("groupName");
-    const memberUserId = $("memberUserId");
-    const addMemberButton = $("addMemberButton");
-    const selectedMembers = $("selectedMembers");
+    const editGroupModal =
+        document.getElementById("editGroupModal");
 
-    const groupNameError = $("groupNameError");
-    const memberError = $("memberError");
+    const closeCreateModal =
+        document.getElementById("closeCreateModal");
 
-    const joinGroupCode = $("joinGroupCode");
-    const joinGroupError = $("joinGroupError");
+    const closeJoinModal =
+        document.getElementById("closeJoinModal");
 
-    const guestClaimBox = $("guestClaimBox");
-    const guestClaimSelect = $("guestClaimSelect");
+    const closeEditModal =
+        document.getElementById("closeEditModal");
+
+    const cancelCreateGroup =
+        document.getElementById("cancelCreateGroup");
+
+    const cancelJoinGroup =
+        document.getElementById("cancelJoinGroup");
+
+    const cancelEditGroup =
+        document.getElementById("cancelEditGroup");
+
+    const groupForm =
+        document.getElementById("groupForm");
+
+    const joinGroupForm =
+        document.getElementById("joinGroupForm");
+
+    const editGroupForm =
+        document.getElementById("editGroupForm");
+
+    const groupName =
+        document.getElementById("groupName");
+
+    const memberUserId =
+        document.getElementById("memberUserId");
+
+    const addMemberButton =
+        document.getElementById("addMemberButton");
+
+    const selectedMembers =
+        document.getElementById("selectedMembers");
+
+    const groupNameError =
+        document.getElementById("groupNameError");
+
+    const memberError =
+        document.getElementById("memberError");
+
+    const joinGroupCode =
+        document.getElementById("joinGroupCode");
+
+    const joinGroupError =
+        document.getElementById("joinGroupError");
+
+    const guestClaimBox =
+        document.getElementById("guestClaimBox");
+
+    const guestClaimSelect =
+        document.getElementById("guestClaimSelect");
 
     const registeredMemberMode =
-        $("registeredMemberMode");
+        document.getElementById("registeredMemberMode");
 
     const guestMemberMode =
-        $("guestMemberMode");
+        document.getElementById("guestMemberMode");
 
     const registeredMemberBox =
-        $("registeredMemberBox");
+        document.getElementById("registeredMemberBox");
 
     const guestMemberBox =
-        $("guestMemberBox");
+        document.getElementById("guestMemberBox");
 
     const guestMemberName =
-        $("guestMemberName");
+        document.getElementById("guestMemberName");
 
     const addGuestMemberButton =
-        $("addGuestMemberButton");
+        document.getElementById("addGuestMemberButton");
 
     const editGroupName =
-        $("editGroupName");
+        document.getElementById("editGroupName");
 
     const editSelectedMembers =
-        $("editSelectedMembers");
+        document.getElementById("editSelectedMembers");
 
     const editMemberUserId =
-        $("editMemberUserId");
+        document.getElementById("editMemberUserId");
 
     const editAddMemberButton =
-        $("editAddMemberButton");
+        document.getElementById("editAddMemberButton");
 
     const editMemberError =
-        $("editMemberError");
+        document.getElementById("editMemberError");
 
     const editRegisteredMemberMode =
-        $("editRegisteredMemberMode");
+        document.getElementById("editRegisteredMemberMode");
 
     const editGuestMemberMode =
-        $("editGuestMemberMode");
+        document.getElementById("editGuestMemberMode");
 
     const editRegisteredMemberBox =
-        $("editRegisteredMemberBox");
+        document.getElementById("editRegisteredMemberBox");
 
     const editGuestMemberBox =
-        $("editGuestMemberBox");
+        document.getElementById("editGuestMemberBox");
 
     const editGuestMemberName =
-        $("editGuestMemberName");
+        document.getElementById("editGuestMemberName");
 
     const editAddGuestMemberButton =
-        $("editAddGuestMemberButton");
+        document.getElementById("editAddGuestMemberButton");
 
     const editGroupNameError =
-        $("editGroupNameError");
+        document.getElementById("editGroupNameError");
 
-    function on(element, event, handler) {
-        if (element) {
-            element.addEventListener(event, handler);
-        }
-    }
+    let newMembers = [];
 
-    function onAll(selector, event, handler) {
-
-        document
-            .querySelectorAll(selector)
-            .forEach(element => {
-
-                element.addEventListener(
-                    event,
-                    () => handler(element)
-                );
-
-            });
-    }
-
+    let editingGroupId = null;
 
     
-    function normalize(value) {
+async function saveGroups() {
+    localStorage.setItem(
+        "smartSettleGroups",
+        JSON.stringify(groups)
+    );
 
-        return String(value)
-            .trim()
-            .toUpperCase();
-    }
-    function saveGroups() {
-
-        localStorage.setItem(
-            "smartSettleGroups",
-            JSON.stringify(groups)
+    try {
+        const response = await fetch(
+            "http://localhost:3000/api/groups"
         );
+
+        if (!response.ok) {
+            throw new Error("Unable to fetch groups from backend");
+        }
+
+        const serverGroups = await response.json();
+
+        for (const group of groups) {
+            const existingGroup = serverGroups.find(
+                item => item.groupId === group.groupId
+            );
+
+            const result = await fetch(
+                existingGroup
+                    ? `http://localhost:3000/api/groups/${encodeURIComponent(group.groupId)}`
+                    : "http://localhost:3000/api/groups",
+                {
+                    method: existingGroup ? "PUT" : "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(group)
+                }
+            );
+
+            if (!result.ok) {
+                const error = await result.json();
+                throw new Error(error.message || "Group sync failed");
+            }
+        }
+
+        console.log("Groups synced with backend successfully");
+    } catch (error) {
+        console.error("Backend sync failed:", error);
     }
+}
+
 
     function generateGroupId() {
-
         return (
             "GRP" +
             Date.now() +
@@ -160,14 +214,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function generateGroupCode() {
-
         const characters =
             "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
         let code = "";
 
         for (let i = 0; i < 6; i++) {
-
             code += characters.charAt(
                 Math.floor(
                     Math.random() *
@@ -179,69 +231,44 @@ document.addEventListener("DOMContentLoaded", function () {
         return code;
     }
 
-
     function getUniqueGroupCode() {
-
         let code;
 
         do {
-
             code = generateGroupCode();
-
         } while (
             groups.some(
                 group =>
-                    normalize(group.groupCode) === code
+                    String(
+                        group.groupCode
+                    ).toUpperCase() === code
             )
         );
 
         return code;
     }
 
-
-    function findGroup(groupId) {
-
-        return groups.find(
-            group =>
-                normalize(group.groupId) ===
-                normalize(groupId)
-        );
-    }
-
-
-    function findGroupByCode(code) {
-
-        return groups.find(
-            group =>
-                normalize(group.groupCode) ===
-                normalize(code)
-        );
-    }
-
-
     function getUserById(userId) {
-
         return users.find(
             user =>
-                normalize(user.userId) ===
-                normalize(userId)
+                String(user.userId)
+                    .trim()
+                    .toUpperCase() ===
+                String(userId)
+                    .trim()
+                    .toUpperCase()
         );
     }
 
-
     function getUserName(userId) {
-
-        const user =
-            getUserById(userId);
+        const user = getUserById(userId);
 
         return user
             ? user.name
             : userId;
     }
 
-
     function isGuest(member) {
-
         return (
             typeof member === "object" &&
             member !== null &&
@@ -249,50 +276,29 @@ document.addEventListener("DOMContentLoaded", function () {
         );
     }
 
-
     function getMemberId(member) {
+        if (isGuest(member)) {
+            return member.memberId;
+        }
 
-        return isGuest(member)
-            ? member.memberId
-            : String(member);
+        return String(member);
     }
-
 
     function getMemberUserId(member) {
+        if (isGuest(member)) {
+            return member.userId || null;
+        }
 
-        return isGuest(member)
-            ? member.userId || null
-            : String(member);
+        return String(member);
     }
-
 
     function getMemberName(member) {
+        if (isGuest(member)) {
+            return member.name;
+        }
 
-        return isGuest(member)
-            ? member.name
-            : getUserName(member);
+        return getUserName(member);
     }
-
-
-    function createGuest(name) {
-
-        return {
-
-            memberId:
-                "GUEST_" +
-                Date.now() +
-                Math.random()
-                    .toString(36)
-                    .substring(2, 6),
-
-            name: name,
-
-            type: "guest",
-
-            userId: null
-        };
-    }
-
 
     function isCurrentUserMember(group) {
 
@@ -305,7 +311,9 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         const currentUserId =
-            normalize(currentUser.userId);
+            String(currentUser.userId)
+                .trim()
+                .toUpperCase();
 
         return group.members.some(
             member => {
@@ -315,7 +323,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 return (
                     memberUserId &&
-                    normalize(memberUserId) ===
+                    String(memberUserId)
+                        .trim()
+                        .toUpperCase() ===
                     currentUserId
                 );
             }
@@ -323,84 +333,73 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function getVisibleGroups() {
-
         return groups.filter(
             group =>
                 isCurrentUserMember(group)
         );
     }
 
-
     function openModal(modal) {
-
         if (modal) {
             modal.classList.add("show");
         }
     }
 
-
     function closeModal(modal) {
-
         if (modal) {
             modal.classList.remove("show");
         }
     }
 
-
-    function openCreateGroup() {
-
-        clearCreateForm();
-
-        openModal(createGroupModal);
-    }
-
-
-    function openJoinGroupModal() {
-
-        joinGroupCode.value = "";
-
-        joinGroupError.textContent = "";
-
-        guestClaimBox.style.display =
-            "none";
-
-        openModal(joinGroupModal);
-    }
-
-
     function clearCreateForm() {
 
-        groupName.value = "";
+        if (groupName) {
+            groupName.value = "";
+        }
 
-        memberUserId.value = "";
+        if (memberUserId) {
+            memberUserId.value = "";
+        }
 
-        guestMemberName.value = "";
+        if (guestMemberName) {
+            guestMemberName.value = "";
+        }
 
         newMembers = [];
 
-        groupNameError.textContent = "";
+        if (groupNameError) {
+            groupNameError.textContent = "";
+        }
 
-        memberError.textContent = "";
+        if (memberError) {
+            memberError.textContent = "";
+        }
 
+        if (
+            registeredMemberMode &&
+            guestMemberMode
+        ) {
+            registeredMemberMode.classList.add(
+                "active"
+            );
 
-        registeredMemberMode.classList.add(
-            "active"
-        );
+            guestMemberMode.classList.remove(
+                "active"
+            );
+        }
 
-        guestMemberMode.classList.remove(
-            "active"
-        );
+        if (registeredMemberBox) {
+            registeredMemberBox.style.display =
+                "block";
+        }
 
-        registeredMemberBox.style.display =
-            "block";
-
-        guestMemberBox.style.display =
-            "none";
-
+        if (guestMemberBox) {
+            guestMemberBox.style.display =
+                "none";
+        }
 
         renderSelectedMembers();
     }
-
 
     function renderSelectedMembers() {
 
@@ -409,7 +408,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         selectedMembers.innerHTML = "";
-
 
         newMembers.forEach(
             member => {
@@ -425,30 +423,20 @@ document.addEventListener("DOMContentLoaded", function () {
                         ? "Guest Member"
                         : getMemberUserId(member);
 
-
                 const item =
                     document.createElement("div");
 
                 item.className =
                     "selected-member";
 
-
                 item.innerHTML = `
-
                     <span class="selected-member-avatar">
                         ${name.charAt(0).toUpperCase()}
                     </span>
 
                     <div class="selected-member-info">
-
-                        <strong>
-                            ${name}
-                        </strong>
-
-                        <span>
-                            ${label}
-                        </span>
-
+                        <strong>${name}</strong>
+                        <span>${label}</span>
                     </div>
 
                     <button
@@ -458,83 +446,76 @@ document.addEventListener("DOMContentLoaded", function () {
                     >
                         <i class="fa-solid fa-xmark"></i>
                     </button>
-
                 `;
 
-
-                selectedMembers.appendChild(
-                    item
-                );
+                selectedMembers.appendChild(item);
             }
         );
 
-        onAll(
-            ".remove-member-button",
-            "click",
-            button => {
+        document
+            .querySelectorAll(
+                ".remove-member-button"
+            )
+            .forEach(
+                button => {
 
-                const id =
-                    button.dataset.memberId;
+                    button.addEventListener(
+                        "click",
+                        function () {
 
-                newMembers =
-                    newMembers.filter(
-                        member =>
-                            String(
-                                getMemberId(member)
-                            ) !==
-                            String(id)
+                            const id =
+                                this.dataset.memberId;
+
+                            newMembers =
+                                newMembers.filter(
+                                    member =>
+                                        String(
+                                            getMemberId(
+                                                member
+                                            )
+                                        ) !==
+                                        String(id)
+                                );
+
+                            renderSelectedMembers();
+                        }
                     );
-
-                renderSelectedMembers();
-            }
-        );
+                }
+            );
     }
-
 
     function addMember() {
 
         memberError.textContent = "";
 
-
         const userId =
-            normalize(
-                memberUserId.value
-            );
-
+            memberUserId.value
+                .trim()
+                .toUpperCase();
 
         if (!userId) {
-
             memberError.textContent =
                 "Enter a User ID.";
-
             return;
         }
-
 
         const user =
             getUserById(userId);
 
-
         if (!user) {
-
             memberError.textContent =
                 "No registered user found with this User ID.";
-
             return;
         }
-
 
         if (
-            normalize(user.userId) ===
-            normalize(currentUser.userId)
+            String(user.userId).toUpperCase() ===
+            String(currentUser.userId).toUpperCase()
         ) {
-
             memberError.textContent =
                 "You are already added to the group.";
-
             return;
         }
-
 
         const exists =
             newMembers.some(
@@ -545,134 +526,108 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     return (
                         id &&
-                        normalize(id) ===
-                        normalize(user.userId)
+                        String(id).toUpperCase() ===
+                        String(user.userId).toUpperCase()
                     );
                 }
             );
 
-
         if (exists) {
-
             memberError.textContent =
                 "This member is already added.";
-
             return;
         }
 
-
-        newMembers.push(
-            user.userId
-        );
+        newMembers.push(user.userId);
 
         memberUserId.value = "";
 
         renderSelectedMembers();
     }
 
-
     function addGuestMember() {
 
         memberError.textContent = "";
 
-
         const name =
             guestMemberName.value.trim();
 
-
         if (name.length < 2) {
-
             memberError.textContent =
                 "Enter a valid guest name.";
-
             return;
         }
-
 
         const exists =
             newMembers.some(
                 member =>
                     isGuest(member) &&
-                    normalize(member.name) ===
-                    normalize(name)
+                    String(member.name)
+                        .toLowerCase() ===
+                    name.toLowerCase()
             );
 
-
         if (exists) {
-
             memberError.textContent =
                 "This guest is already added.";
-
             return;
         }
 
+        newMembers.push({
+            memberId:
+                "GUEST_" +
+                Date.now() +
+                Math.random()
+                    .toString(36)
+                    .substring(2, 6),
 
-        newMembers.push(
-            createGuest(name)
-        );
+            name: name,
+
+            type: "guest",
+
+            userId: null
+        });
 
         guestMemberName.value = "";
 
         renderSelectedMembers();
     }
 
-
     function createGroup(event) {
 
         event.preventDefault();
 
         groupNameError.textContent = "";
-
         memberError.textContent = "";
-
 
         const name =
             groupName.value.trim();
 
-
         if (name.length < 2) {
-
             groupNameError.textContent =
                 "Group name must contain at least 2 characters.";
-
             return;
         }
-
 
         if (newMembers.length === 0) {
-
             memberError.textContent =
                 "Add at least one other member.";
-
             return;
         }
 
-
-        const duplicate =
-            groups.some(
-                group =>
-                    normalize(
-                        group.createdBy
-                    ) ===
-                    normalize(
-                        currentUser.userId
-                    ) &&
-
-                    normalize(
-                        group.groupName
-                    ) ===
-                    normalize(name)
-            );
-
+        const duplicate = groups.some(
+    group =>
+        group.createdBy === currentUser.userId &&
+        String(group.groupName)
+            .toLowerCase() ===
+        name.toLowerCase()
+);
 
         if (duplicate) {
-
             groupNameError.textContent =
                 "A group with this name already exists.";
-
             return;
         }
-
 
         const newGroup = {
 
@@ -701,17 +656,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 new Date().toISOString()
         };
 
-
         groups.push(newGroup);
 
         saveGroups();
-
 
         localStorage.setItem(
             "selectedGroupId",
             newGroup.groupId
         );
-
 
         closeModal(createGroupModal);
 
@@ -719,25 +671,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
         renderGroups();
 
-
         alert(
-            `Group "${name}" created successfully.
-
-Group Code: ${newGroup.groupCode}`
+            `Group "${name}" created successfully.\n\nGroup Code: ${newGroup.groupCode}`
         );
     }
-
 
     function prepareGuestClaims(group) {
 
         guestClaimSelect.innerHTML = `
-
             <option value="">
                 Join as a new member
             </option>
-
         `;
-
 
         const guests =
             group.members.filter(
@@ -745,23 +690,17 @@ Group Code: ${newGroup.groupCode}`
                     isGuest(member)
             );
 
-
         if (guests.length === 0) {
-
             guestClaimBox.style.display =
                 "none";
-
             return;
         }
-
 
         guests.forEach(
             guest => {
 
                 const option =
-                    document.createElement(
-                        "option"
-                    );
+                    document.createElement("option");
 
                 option.value =
                     guest.memberId;
@@ -775,49 +714,42 @@ Group Code: ${newGroup.groupCode}`
             }
         );
 
-
         guestClaimBox.style.display =
             "block";
     }
 
-
-    // Checks the Group Code while the user types.
     function checkJoinCode() {
 
         const code =
-            normalize(
-                joinGroupCode.value
-            );
-
+            joinGroupCode.value
+                .trim()
+                .toUpperCase();
 
         if (code.length < 6) {
-
             guestClaimBox.style.display =
                 "none";
-
             return;
         }
 
-
         const group =
-            findGroupByCode(code);
-
+            groups.find(
+                item =>
+                    String(item.groupCode)
+                        .toUpperCase() ===
+                    code
+            );
 
         if (
             !group ||
             isCurrentUserMember(group)
         ) {
-
             guestClaimBox.style.display =
                 "none";
-
             return;
         }
 
-
         prepareGuestClaims(group);
     }
-
 
     function joinGroup(event) {
 
@@ -825,49 +757,39 @@ Group Code: ${newGroup.groupCode}`
 
         joinGroupError.textContent = "";
 
-
         const code =
-            normalize(
-                joinGroupCode.value
-            );
-
+            joinGroupCode.value
+                .trim()
+                .toUpperCase();
 
         if (!code) {
-
             joinGroupError.textContent =
                 "Enter a Group Code.";
-
             return;
         }
-
 
         const group =
-            findGroupByCode(code);
-
+            groups.find(
+                item =>
+                    String(item.groupCode)
+                        .toUpperCase() ===
+                    code
+            );
 
         if (!group) {
-
             joinGroupError.textContent =
                 "Invalid Group Code.";
-
             return;
         }
 
-
-        if (
-            isCurrentUserMember(group)
-        ) {
-
+        if (isCurrentUserMember(group)) {
             joinGroupError.textContent =
                 "You are already a member of this group.";
-
             return;
         }
-
 
         const claimId =
             guestClaimSelect.value;
-
 
         if (claimId) {
 
@@ -875,18 +797,13 @@ Group Code: ${newGroup.groupCode}`
                 group.members.findIndex(
                     member =>
                         isGuest(member) &&
-                        String(
-                            member.memberId
-                        ) ===
+                        String(member.memberId) ===
                         String(claimId)
                 );
 
-
             if (index === -1) {
-
                 joinGroupError.textContent =
                     "Guest member could not be found.";
-
                 return;
             }
 
@@ -900,20 +817,16 @@ Group Code: ${newGroup.groupCode}`
             );
         }
 
-
         saveGroups();
-
 
         localStorage.setItem(
             "selectedGroupId",
             group.groupId
         );
 
-
         closeModal(joinGroupModal);
 
         renderGroups();
-
 
         alert(
             claimId
@@ -922,56 +835,47 @@ Group Code: ${newGroup.groupCode}`
         );
     }
 
-
     function openEditGroup(groupId) {
 
         const group =
-            findGroup(groupId);
-
+            groups.find(
+                item =>
+                    String(item.groupId) ===
+                    String(groupId)
+            );
 
         if (!group) {
             return;
         }
 
-
         if (
-            normalize(group.createdBy) !==
-            normalize(currentUser.userId)
+            String(group.createdBy).toUpperCase() !==
+            String(currentUser.userId).toUpperCase()
         ) {
-
             alert(
                 "Only the group creator can edit this group."
             );
-
             return;
         }
-
 
         editingGroupId =
             groupId;
 
-
         editGroupName.value =
             group.groupName;
 
-        editGroupNameError.textContent =
-            "";
+        editGroupNameError.textContent = "";
 
-        editMemberError.textContent =
-            "";
-
+        editMemberError.textContent = "";
 
         renderEditMembers(group);
 
         openModal(editGroupModal);
     }
 
-
     function renderEditMembers(group) {
 
-        editSelectedMembers.innerHTML =
-            "";
-
+        editSelectedMembers.innerHTML = "";
 
         group.members.forEach(
             member => {
@@ -982,36 +886,27 @@ Group Code: ${newGroup.groupCode}`
                 const id =
                     getMemberId(member);
 
-
                 const isSelf =
-                    normalize(
+                    String(
                         getMemberUserId(member)
-                    ) ===
-                    normalize(
+                    ).toUpperCase() ===
+                    String(
                         currentUser.userId
-                    );
-
+                    ).toUpperCase();
 
                 const item =
-                    document.createElement(
-                        "div"
-                    );
+                    document.createElement("div");
 
                 item.className =
                     "selected-member";
 
-
                 item.innerHTML = `
-
                     <span class="selected-member-avatar">
                         ${name.charAt(0).toUpperCase()}
                     </span>
 
                     <div class="selected-member-info">
-
-                        <strong>
-                            ${name}
-                        </strong>
+                        <strong>${name}</strong>
 
                         <span>
                             ${
@@ -1020,7 +915,6 @@ Group Code: ${newGroup.groupCode}`
                                     : getMemberUserId(member)
                             }
                         </span>
-
                     </div>
 
                     ${
@@ -1036,134 +930,113 @@ Group Code: ${newGroup.groupCode}`
                             `
                             : ""
                     }
-
                 `;
 
-
-                editSelectedMembers.appendChild(
-                    item
-                );
+                editSelectedMembers.appendChild(item);
             }
         );
 
+        document
+            .querySelectorAll(
+                ".remove-edit-member-button"
+            )
+            .forEach(
+                button => {
 
-        // Add remove functionality to
-        // edit-member buttons.
-        onAll(
-            ".remove-edit-member-button",
-            "click",
-            button => {
-                if (
-                    group.members.length <= 2
-                ) {
+                    button.addEventListener(
+                        "click",
+                        function () {
 
-                    editMemberError.textContent =
-                        "A group must have at least 2 members.";
+                            if (
+                                group.members.length <= 2
+                            ) {
+                                editMemberError.textContent =
+                                    "A group must have at least 2 members.";
+                                return;
+                            }
 
-                    return;
-                }
+                            const id =
+                                this.dataset.memberId;
 
+                            group.members =
+                                group.members.filter(
+                                    member =>
+                                        String(
+                                            getMemberId(member)
+                                        ) !==
+                                        String(id)
+                                );
 
-                const id =
-                    button.dataset.memberId;
+                            saveGroups();
 
+                            renderEditMembers(group);
 
-                group.members =
-                    group.members.filter(
-                        member =>
-                            String(
-                                getMemberId(member)
-                            ) !==
-                            String(id)
+                            renderGroups();
+                        }
                     );
-
-
-                saveGroups();
-
-                renderEditMembers(group);
-
-                renderGroups();
-            }
-        );
+                }
+            );
     }
-
 
     function addEditMember() {
 
-        editMemberError.textContent =
-            "";
-
+        editMemberError.textContent = "";
 
         const userId =
-            normalize(
-                editMemberUserId.value
-            );
-
+            editMemberUserId.value
+                .trim()
+                .toUpperCase();
 
         if (!userId) {
-
             editMemberError.textContent =
                 "Enter a User ID.";
-
             return;
         }
-
 
         const user =
             getUserById(userId);
 
-
         if (!user) {
-
             editMemberError.textContent =
                 "No registered user found with this User ID.";
-
             return;
         }
 
-
         const group =
-            findGroup(
-                editingGroupId
+            groups.find(
+                item =>
+                    String(item.groupId) ===
+                    String(editingGroupId)
             );
-
 
         if (!group) {
             return;
         }
-
 
         const exists =
             group.members.some(
                 member => {
 
                     const id =
-                        getMemberUserId(
-                            member
-                        );
+                        getMemberUserId(member);
 
                     return (
                         id &&
-                        normalize(id) ===
-                        normalize(user.userId)
+                        String(id).toUpperCase() ===
+                        String(user.userId).toUpperCase()
                     );
                 }
             );
 
-
         if (exists) {
-
             editMemberError.textContent =
                 "This member is already in the group.";
-
             return;
         }
-
 
         group.members.push(
             user.userId
         );
-
 
         saveGroups();
 
@@ -1174,104 +1047,96 @@ Group Code: ${newGroup.groupCode}`
         renderGroups();
     }
 
-
     function addEditGuestMember() {
 
-        editMemberError.textContent =
-            "";
-
+        editMemberError.textContent = "";
 
         const name =
             editGuestMemberName.value.trim();
 
-
         if (name.length < 2) {
-
             editMemberError.textContent =
                 "Enter a valid guest name.";
-
             return;
         }
 
-
         const group =
-            findGroup(
-                editingGroupId
+            groups.find(
+                item =>
+                    String(item.groupId) ===
+                    String(editingGroupId)
             );
-
 
         if (!group) {
             return;
         }
 
-
         const exists =
             group.members.some(
                 member =>
                     isGuest(member) &&
-                    normalize(member.name) ===
-                    normalize(name)
+                    String(member.name)
+                        .toLowerCase() ===
+                    name.toLowerCase()
             );
 
-
         if (exists) {
-
             editMemberError.textContent =
                 "This guest is already in the group.";
-
             return;
         }
 
+        group.members.push({
 
-        group.members.push(
-            createGuest(name)
-        );
+            memberId:
+                "GUEST_" +
+                Date.now() +
+                Math.random()
+                    .toString(36)
+                    .substring(2, 6),
 
+            name: name,
+
+            type: "guest",
+
+            userId: null
+        });
 
         saveGroups();
 
-        editGuestMemberName.value =
-            "";
+        editGuestMemberName.value = "";
 
         renderEditMembers(group);
 
         renderGroups();
     }
 
-
-
     function saveEditedGroup(event) {
 
         event.preventDefault();
 
-
         const group =
-            findGroup(
-                editingGroupId
+            groups.find(
+                item =>
+                    String(item.groupId) ===
+                    String(editingGroupId)
             );
-
 
         if (!group) {
             return;
         }
 
-
         const name =
             editGroupName.value.trim();
 
-
         if (name.length < 2) {
-
             editGroupNameError.textContent =
                 "Group name must contain at least 2 characters.";
-
             return;
         }
 
-
         group.groupName =
             name;
-
 
         saveGroups();
 
@@ -1280,107 +1145,94 @@ Group Code: ${newGroup.groupCode}`
         renderGroups();
     }
 
-
-
     function deleteGroup(groupId) {
 
         const group =
-            findGroup(groupId);
-
+            groups.find(
+                item =>
+                    String(item.groupId) ===
+                    String(groupId)
+            );
 
         if (!group) {
             return;
         }
 
-
         if (
-            normalize(group.createdBy) !==
-            normalize(currentUser.userId)
+            String(group.createdBy).toUpperCase() !==
+            String(currentUser.userId).toUpperCase()
         ) {
-
             alert(
                 "Only the group creator can delete this group."
             );
-
             return;
         }
-
 
         const confirmed =
             confirm(
                 `Are you sure you want to delete "${group.groupName}"?`
             );
 
-
         if (!confirmed) {
             return;
         }
 
-
         groups =
             groups.filter(
-                group =>
-                    normalize(group.groupId) !==
-                    normalize(groupId)
+                item =>
+                    String(item.groupId) !==
+                    String(groupId)
             );
-
 
         saveGroups();
 
         if (
-            normalize(
+            String(
                 localStorage.getItem(
                     "selectedGroupId"
                 )
             ) ===
-            normalize(groupId)
+            String(groupId)
         ) {
-
             localStorage.removeItem(
                 "selectedGroupId"
             );
         }
 
-
         renderGroups();
     }
-
-
 
     function leaveGroup(groupId) {
 
         const group =
-            findGroup(groupId);
-
+            groups.find(
+                item =>
+                    String(item.groupId) ===
+                    String(groupId)
+            );
 
         if (!group) {
             return;
         }
 
-
         if (
-            normalize(group.createdBy) ===
-            normalize(currentUser.userId)
+            String(group.createdBy).toUpperCase() ===
+            String(currentUser.userId).toUpperCase()
         ) {
-
             alert(
                 "The group creator cannot leave the group. Delete the group instead."
             );
-
             return;
         }
-
 
         const confirmed =
             confirm(
                 `Are you sure you want to leave "${group.groupName}"?`
             );
 
-
         if (!confirmed) {
             return;
         }
-
 
         group.members =
             group.members.filter(
@@ -1391,123 +1243,82 @@ Group Code: ${newGroup.groupCode}`
                     }
 
                     return (
-                        normalize(member) !==
-                        normalize(
+                        String(member)
+                            .trim()
+                            .toUpperCase() !==
+                        String(
                             currentUser.userId
                         )
+                            .trim()
+                            .toUpperCase()
                     );
                 }
             );
 
-
         saveGroups();
 
-
         if (
-            normalize(
+            String(
                 localStorage.getItem(
                     "selectedGroupId"
                 )
             ) ===
-            normalize(groupId)
+            String(groupId)
         ) {
-
             localStorage.removeItem(
                 "selectedGroupId"
             );
         }
 
-
         renderGroups();
     }
 
-    function getTotalExpenses(group) {
+    async function loadGroupsFromBackend() {
+    try {
+        const response = await fetch("http://localhost:3000/api/groups");
 
-        return (
-            group.expenses || []
-        ).reduce(
-            (
-                sum,
-                expense
-            ) =>
-                sum +
-                Number(
-                    expense.amount || 0
-                ),
-            0
+        if (!response.ok) {
+            throw new Error("Failed to load groups");
+        }
+
+        const serverGroups = await response.json();
+
+        groups = serverGroups;
+
+        localStorage.setItem(
+            "smartSettleGroups",
+            JSON.stringify(serverGroups)
         );
+
+        renderGroups();
+
+        console.log("Groups loaded successfully:", serverGroups);
+    } catch (error) {
+        console.error("Could not load groups:", error);
+
+        groups = JSON.parse(
+            localStorage.getItem("smartSettleGroups") || "[]"
+        );
+
+        renderGroups();
     }
-
-
-    function renderGroups() {
-
-        if (!groupsContainer) {
-            return;
-        }
-
-
-        groupsContainer.innerHTML =
-            "";
-
-
-        const visibleGroups =
-            getVisibleGroups();
-
-
-        if (
-            visibleGroups.length === 0
-        ) {
-
-            groupsContainer.style.display =
-                "none";
-
-
-            if (emptyGroups) {
-
-                emptyGroups.style.display =
-                    "flex";
-            }
-
-            return;
-        }
-
-
-        groupsContainer.style.display =
-            "grid";
-
-
-        if (emptyGroups) {
-
-            emptyGroups.style.display =
-                "none";
-        }
-
-
-        visibleGroups.forEach(
-            group => {
-
-                const total =
-                    getTotalExpenses(group);
-
+}
 
                 const isCreator =
-                    normalize(
+                    String(
                         group.createdBy
-                    ) ===
-                    normalize(
+                    ).trim().toUpperCase() ===
+                    String(
                         currentUser.userId
-                    );
-
+                    ).trim().toUpperCase();
 
                 const card =
                     document.createElement(
                         "div"
                     );
 
-
                 card.className =
                     "group-card";
-
 
                 card.innerHTML = `
 
@@ -1531,11 +1342,9 @@ Group Code: ${newGroup.groupCode}`
 
                     </div>
 
-
                     <h2>
                         ${group.groupName}
                     </h2>
-
 
                     <p class="group-card-created">
 
@@ -1545,7 +1354,6 @@ Group Code: ${newGroup.groupCode}`
                         )}
 
                     </p>
-
 
                     <div class="group-card-info">
 
@@ -1560,7 +1368,6 @@ Group Code: ${newGroup.groupCode}`
                             </strong>
 
                         </div>
-
 
                         <div class="group-stat">
 
@@ -1581,7 +1388,6 @@ Group Code: ${newGroup.groupCode}`
 
                     </div>
 
-
                     <div class="group-code">
 
                         <span>
@@ -1594,7 +1400,6 @@ Group Code: ${newGroup.groupCode}`
 
                     </div>
 
-
                     <div class="group-card-actions">
 
                         <button
@@ -1602,32 +1407,23 @@ Group Code: ${newGroup.groupCode}`
                             class="view-group-button"
                             data-group-id="${group.groupId}"
                         >
-
                             <i class="fa-solid fa-arrow-right"></i>
-
                             Open Group
-
                         </button>
-
 
                         <button
                             type="button"
                             class="copy-code-button"
                             data-code="${group.groupCode}"
                         >
-
                             <i class="fa-solid fa-copy"></i>
-
                         </button>
 
                     </div>
 
-
                     ${
                         isCreator
-
                             ? `
-
                                 <div class="group-manage-actions">
 
                                     <button
@@ -1635,32 +1431,22 @@ Group Code: ${newGroup.groupCode}`
                                         class="edit-group-button"
                                         data-group-id="${group.groupId}"
                                     >
-
                                         <i class="fa-solid fa-pen"></i>
-
                                         Edit
-
                                     </button>
-
 
                                     <button
                                         type="button"
                                         class="delete-group-button"
                                         data-group-id="${group.groupId}"
                                     >
-
                                         <i class="fa-solid fa-trash"></i>
-
                                         Delete
-
                                     </button>
 
                                 </div>
-
                             `
-
                             : `
-
                                 <div class="group-manage-actions">
 
                                     <button
@@ -1668,20 +1454,15 @@ Group Code: ${newGroup.groupCode}`
                                         class="leave-group-button"
                                         data-group-id="${group.groupId}"
                                     >
-
                                         <i class="fa-solid fa-right-from-bracket"></i>
-
                                         Leave Group
-
                                     </button>
 
                                 </div>
-
                             `
                     }
 
                 `;
-
 
                 groupsContainer.appendChild(
                     card
@@ -1689,407 +1470,504 @@ Group Code: ${newGroup.groupCode}`
             }
         );
 
+        document
+            .querySelectorAll(
+                ".view-group-button"
+            )
+            .forEach(
+                button => {
 
-        // --------------------------------------------------
-        // DYNAMIC GROUP BUTTONS
-        // --------------------------------------------------
+                    button.addEventListener(
+                        "click",
+                        function () {
 
-        // Open group.
-        onAll(
-            ".view-group-button",
-            "click",
-            button => {
+                            const id =
+                                this.dataset.groupId;
 
-                const group =
-                    findGroup(
-                        button.dataset.groupId
-                    );
+                            const group =
+                                groups.find(
+                                    item =>
+                                        String(
+                                            item.groupId
+                                        ) ===
+                                        String(id)
+                                );
 
+                            if (
+                                !group ||
+                                !isCurrentUserMember(
+                                    group
+                                )
+                            ) {
+                                alert(
+                                    "You do not have access to this group."
+                                );
+                                return;
+                            }
 
-                if (
-                    !group ||
-                    !isCurrentUserMember(
-                        group
-                    )
-                ) {
+                            localStorage.setItem(
+                                "selectedGroupId",
+                                group.groupId
+                            );
 
-                    alert(
-                        "You do not have access to this group."
-                    );
-
-                    return;
-                }
-
-
-                localStorage.setItem(
-                    "selectedGroupId",
-                    group.groupId
-                );
-
-
-                window.location.href =
-                    "dashboard.html";
-            }
-        );
-
-
-        // Copy group code.
-        onAll(
-            ".copy-code-button",
-            "click",
-            async button => {
-
-                const code =
-                    button.dataset.code;
-
-
-                try {
-
-                    await navigator
-                        .clipboard
-                        .writeText(code);
-
-
-                    alert(
-                        "Group code copied: " +
-                        code
-                    );
-
-                } catch (error) {
-
-                    alert(
-                        "Group Code: " +
-                        code
+                            window.location.href =
+                                "dashboard.html";
+                        }
                     );
                 }
-            }
-        );
+            );
 
+        document
+            .querySelectorAll(
+                ".copy-code-button"
+            )
+            .forEach(
+                button => {
 
-        onAll(
-            ".edit-group-button",
+                    button.addEventListener(
+                        "click",
+                        async function () {
+
+                            const code =
+                                this.dataset.code;
+
+                            try {
+
+                                await navigator
+                                    .clipboard
+                                    .writeText(code);
+
+                                alert(
+                                    "Group code copied: " +
+                                    code
+                                );
+
+                            } catch (error) {
+
+                                alert(
+                                    "Group Code: " +
+                                    code
+                                );
+                            }
+                        }
+                    );
+                }
+            );
+
+        document
+            .querySelectorAll(
+                ".edit-group-button"
+            )
+            .forEach(
+                button => {
+
+                    button.addEventListener(
+                        "click",
+                        function () {
+
+                            openEditGroup(
+                                this.dataset.groupId
+                            );
+                        }
+                    );
+                }
+            );
+
+        document
+            .querySelectorAll(
+                ".delete-group-button"
+            )
+            .forEach(
+                button => {
+
+                    button.addEventListener(
+                        "click",
+                        function () {
+
+                            deleteGroup(
+                                this.dataset.groupId
+                            );
+                        }
+                    );
+                }
+            );
+
+        document
+            .querySelectorAll(
+                ".leave-group-button"
+            )
+            .forEach(
+                button => {
+
+                    button.addEventListener(
+                        "click",
+                        function () {
+
+                            leaveGroup(
+                                this.dataset.groupId
+                            );
+                        }
+                    );
+                }
+            );
+        }
+
+    if (openGroupModal) {
+
+        openGroupModal.addEventListener(
             "click",
-            button => {
+            function () {
 
-                openEditGroup(
-                    button.dataset.groupId
-                );
-            }
-        );
+                clearCreateForm();
 
-
-        onAll(
-            ".delete-group-button",
-            "click",
-            button => {
-
-                deleteGroup(
-                    button.dataset.groupId
-                );
-            }
-        );
-
-
-        onAll(
-            ".leave-group-button",
-            "click",
-            button => {
-
-                leaveGroup(
-                    button.dataset.groupId
+                openModal(
+                    createGroupModal
                 );
             }
         );
     }
 
+    if (emptyCreateGroup) {
 
-    on(
-        openGroupModal,
-        "click",
-        openCreateGroup
-    );
+        emptyCreateGroup.addEventListener(
+            "click",
+            function () {
 
-    on(
-        emptyCreateGroup,
-        "click",
-        openCreateGroup
-    );
+                clearCreateForm();
 
-
-    // Join Group buttons.
-    on(
-        openJoinGroup,
-        "click",
-        openJoinGroupModal
-    );
-
-    on(
-        emptyJoinGroup,
-        "click",
-        openJoinGroupModal
-    );
-
-
-    on(
-        closeCreateModal,
-        "click",
-        () => closeModal(
-            createGroupModal
-        )
-    );
-
-    on(
-        closeJoinModal,
-        "click",
-        () => closeModal(
-            joinGroupModal
-        )
-    );
-
-    on(
-        closeEditModal,
-        "click",
-        () => closeModal(
-            editGroupModal
-        )
-    );
-
-
-    // Cancel buttons.
-    on(
-        cancelCreateGroup,
-        "click",
-        () => closeModal(
-            createGroupModal
-        )
-    );
-
-    on(
-        cancelJoinGroup,
-        "click",
-        () => closeModal(
-            joinGroupModal
-        )
-    );
-
-    on(
-        cancelEditGroup,
-        "click",
-        () => closeModal(
-            editGroupModal
-        )
-    );
-
-
-    on(
-        registeredMemberMode,
-        "click",
-        () => {
-
-            registeredMemberMode
-                .classList
-                .add("active");
-
-            guestMemberMode
-                .classList
-                .remove("active");
-
-
-            registeredMemberBox.style.display =
-                "block";
-
-            guestMemberBox.style.display =
-                "none";
-        }
-    );
-
-
-    on(
-        guestMemberMode,
-        "click",
-        () => {
-
-            guestMemberMode
-                .classList
-                .add("active");
-
-            registeredMemberMode
-                .classList
-                .remove("active");
-
-
-            registeredMemberBox.style.display =
-                "none";
-
-            guestMemberBox.style.display =
-                "block";
-        }
-    );
-
-
-    on(
-        addMemberButton,
-        "click",
-        addMember
-    );
-
-
-    on(
-        addGuestMemberButton,
-        "click",
-        addGuestMember
-    );
-
-
-    on(
-        memberUserId,
-        "keydown",
-        event => {
-
-            if (event.key === "Enter") {
-
-                event.preventDefault();
-
-                addMember();
+                openModal(
+                    createGroupModal
+                );
             }
-        }
-    );
+        );
+    }
 
-    on(
-        guestMemberName,
-        "keydown",
-        event => {
+    if (emptyJoinGroup) {
 
-            if (event.key === "Enter") {
+        emptyJoinGroup.addEventListener(
+            "click",
+            function () {
 
-                event.preventDefault();
+                joinGroupCode.value = "";
 
-                addGuestMember();
+                joinGroupError.textContent = "";
+
+                guestClaimBox.style.display =
+                    "none";
+
+                openModal(
+                    joinGroupModal
+                );
             }
-        }
-    );
+        );
+    }
 
+    if (openJoinGroup) {
 
+        openJoinGroup.addEventListener(
+            "click",
+            function () {
 
-    on(
-        groupForm,
-        "submit",
-        createGroup
-    );
+                joinGroupCode.value = "";
 
+                joinGroupError.textContent = "";
 
-    on(
-        joinGroupCode,
-        "input",
-        checkJoinCode
-    );
+                guestClaimBox.style.display =
+                    "none";
 
-
-    on(
-        joinGroupForm,
-        "submit",
-        joinGroup
-    );
-
-
-    on(
-        editRegisteredMemberMode,
-        "click",
-        () => {
-
-            editRegisteredMemberMode
-                .classList
-                .add("active");
-
-            editGuestMemberMode
-                .classList
-                .remove("active");
-
-
-            editRegisteredMemberBox
-                .style
-                .display =
-                "block";
-
-            editGuestMemberBox
-                .style
-                .display =
-                "none";
-
-
-            editMemberError.textContent =
-                "";
-        }
-    );
-
-
-    on(
-        editGuestMemberMode,
-        "click",
-        () => {
-
-            editGuestMemberMode
-                .classList
-                .add("active");
-
-            editRegisteredMemberMode
-                .classList
-                .remove("active");
-
-
-            editRegisteredMemberBox
-                .style
-                .display =
-                "none";
-
-            editGuestMemberBox
-                .style
-                .display =
-                "block";
-
-
-            editMemberError.textContent =
-                "";
-        }
-    );
-
-
-
-    on(
-        editAddMemberButton,
-        "click",
-        addEditMember
-    );
-
-
-    on(
-        editAddGuestMemberButton,
-        "click",
-        addEditGuestMember
-    );
-
-
-    on(
-        editGuestMemberName,
-        "keydown",
-        event => {
-
-            if (event.key === "Enter") {
-
-                event.preventDefault();
-
-                addEditGuestMember();
+                openModal(
+                    joinGroupModal
+                );
             }
-        }
-    );
+        );
+    }
 
+    if (closeCreateModal) {
 
-    on(
-        editGroupForm,
-        "submit",
-        saveEditedGroup
-    );
+        closeCreateModal.addEventListener(
+            "click",
+            function () {
 
-    renderGroups();
+                closeModal(
+                    createGroupModal
+                );
+            }
+        );
+    }
+
+    if (closeJoinModal) {
+
+        closeJoinModal.addEventListener(
+            "click",
+            function () {
+
+                closeModal(
+                    joinGroupModal
+                );
+            }
+        );
+    }
+
+    if (closeEditModal) {
+
+        closeEditModal.addEventListener(
+            "click",
+            function () {
+
+                closeModal(
+                    editGroupModal
+                );
+            }
+        );
+    }
+
+    if (cancelCreateGroup) {
+
+        cancelCreateGroup.addEventListener(
+            "click",
+            function () {
+
+                closeModal(
+                    createGroupModal
+                );
+            }
+        );
+    }
+
+    if (cancelJoinGroup) {
+
+        cancelJoinGroup.addEventListener(
+            "click",
+            function () {
+
+                closeModal(
+                    joinGroupModal
+                );
+            }
+        );
+    }
+
+    if (cancelEditGroup) {
+
+        cancelEditGroup.addEventListener(
+            "click",
+            function () {
+
+                closeModal(
+                    editGroupModal
+                );
+            }
+        );
+    }
+
+    if (registeredMemberMode) {
+
+        registeredMemberMode.addEventListener(
+            "click",
+            function () {
+
+                registeredMemberMode.classList.add(
+                    "active"
+                );
+
+                guestMemberMode.classList.remove(
+                    "active"
+                );
+
+                registeredMemberBox.style.display =
+                    "block";
+
+                guestMemberBox.style.display =
+                    "none";
+            }
+        );
+    }
+
+    if (guestMemberMode) {
+
+        guestMemberMode.addEventListener(
+            "click",
+            function () {
+
+                guestMemberMode.classList.add(
+                    "active"
+                );
+
+                registeredMemberMode.classList.remove(
+                    "active"
+                );
+
+                registeredMemberBox.style.display =
+                    "none";
+
+                guestMemberBox.style.display =
+                    "block";
+            }
+        );
+    }
+
+    if (addMemberButton) {
+
+        addMemberButton.addEventListener(
+            "click",
+            addMember
+        );
+    }
+
+    if (addGuestMemberButton) {
+
+        addGuestMemberButton.addEventListener(
+            "click",
+            addGuestMember
+        );
+    }
+
+    if (memberUserId) {
+
+        memberUserId.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (event.key === "Enter") {
+
+                    event.preventDefault();
+
+                    addMember();
+                }
+            }
+        );
+    }
+
+    if (guestMemberName) {
+
+        guestMemberName.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (event.key === "Enter") {
+
+                    event.preventDefault();
+
+                    addGuestMember();
+                }
+            }
+        );
+    }
+
+    if (groupForm) {
+
+        groupForm.addEventListener(
+            "submit",
+            createGroup
+        );
+    }
+
+    if (joinGroupCode) {
+
+        joinGroupCode.addEventListener(
+            "input",
+            checkJoinCode
+        );
+    }
+
+    if (joinGroupForm) {
+
+        joinGroupForm.addEventListener(
+            "submit",
+            joinGroup
+        );
+    }
+
+    if (editAddMemberButton) {
+
+        editAddMemberButton.addEventListener(
+            "click",
+            addEditMember
+        );
+    }
+
+    if (editGroupForm) {
+
+        editGroupForm.addEventListener(
+            "submit",
+            saveEditedGroup
+        );
+    }
+
+    if (editRegisteredMemberMode) {
+
+        editRegisteredMemberMode.addEventListener(
+            "click",
+            function () {
+
+                editRegisteredMemberMode.classList.add(
+                    "active"
+                );
+
+                editGuestMemberMode.classList.remove(
+                    "active"
+                );
+
+                editRegisteredMemberBox.style.display =
+                    "block";
+
+                editGuestMemberBox.style.display =
+                    "none";
+
+                editMemberError.textContent = "";
+            }
+        );
+    }
+
+    if (editGuestMemberMode) {
+
+        editGuestMemberMode.addEventListener(
+            "click",
+            function () {
+
+                editGuestMemberMode.classList.add(
+                    "active"
+                );
+
+                editRegisteredMemberMode.classList.remove(
+                    "active"
+                );
+
+                editRegisteredMemberBox.style.display =
+                    "none";
+
+                editGuestMemberBox.style.display =
+                    "block";
+
+                editMemberError.textContent = "";
+            }
+        );
+    }
+
+    if (editAddGuestMemberButton) {
+
+        editAddGuestMemberButton.addEventListener(
+            "click",
+            addEditGuestMember
+        );
+    }
+
+    if (editGuestMemberName) {
+
+        editGuestMemberName.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (event.key === "Enter") {
+
+                    event.preventDefault();
+
+                    addEditGuestMember();
+                }
+            }
+        );
+    }
+
+    loadGroupsFromBackend();
 
 });

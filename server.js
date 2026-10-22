@@ -44,9 +44,9 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 // Private uploads (/server/uploads/receipts) and /db.json are never exposed publicly.
-app.use('/css', express.static(path.join(__dirname, 'css')));
-app.use('/js', express.static(path.join(__dirname, 'js')));
-app.use('/assets', express.static(path.join(__dirname, 'assets')));
+app.use('/css', express.static(path.join(__dirname, 'Split-Bro', 'css'))); app.use(express.static(path.join(__dirname, 'Split-Bro')));
+app.use('/js', express.static(path.join(__dirname, 'Split-Bro', 'js')));
+app.use('/assets', express.static(path.join(__dirname, 'Split-Bro', 'assets')));
 
 const ALLOWED_STATIC_PAGES = new Set([
     'index.html', 'login.html', 'signup.html', 'dashboard.html',
@@ -56,7 +56,7 @@ const ALLOWED_STATIC_PAGES = new Set([
 
 app.get('/:page', (req, res, next) => {
     if (ALLOWED_STATIC_PAGES.has(req.params.page)) {
-        return res.sendFile(path.join(__dirname, req.params.page));
+        if (req.params.page === 'test-api.html') return res.sendFile(path.join(__dirname, 'test-api.html')); return res.sendFile(path.join(__dirname, 'Split-Bro', req.params.page));
     }
     return next();
 });
@@ -152,3 +152,4 @@ if (require.main === module) {
 module.exports = app;
 module.exports.app = app;
 module.exports.startServer = startServer;
+
