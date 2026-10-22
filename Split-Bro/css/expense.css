@@ -22,11 +22,18 @@
     font-size:11px;
 }
 
-.expense-layout{
-    display:grid;
-    grid-template-columns:minmax(0,2fr) minmax(280px,1fr);
-    gap:22px;
+
+.expense-layout {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 28px;
+    align-items: start;
 }
+.expense-sidebar {
+    display: flex;
+    flex-direction: column;
+}
+
 
 .expense-form-card,
 .expense-preview-card{

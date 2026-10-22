@@ -226,42 +226,6 @@
                     <span class="expense-error" id="groupError"></span>
                 </div>
 
-                <div class="expense-field receipt-upload-field">
-                    <label>
-                        <i class="fa-solid fa-camera" style="color:#10b981;margin-right:6px;"></i> Bill / Receipt Photo (Multer Upload &amp; OCR Extraction)
-                    </label>
-                    <div class="receipt-drop-box" id="receiptDropZone">
-                        <input type="file" id="receiptFileInput" name="receipt" accept="image/jpeg,image/png,image/webp,application/pdf" style="display:none;">
-                        <div class="drop-content" id="dropContent">
-                            <div class="drop-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
-                            <h4>Click or Drag &amp; Drop Bill Photo</h4>
-                            <p>Upload receipt (JPG, PNG, WEBP) &bull; Automatically extracts total &amp; merchant</p>
-                            <button type="button" class="btn-browse-photo" id="btnBrowseReceipt">
-                                <i class="fa-solid fa-image"></i> Browse Receipt Photo
-                            </button>
-                        </div>
-                        <div class="receipt-preview-box" id="receiptPreviewBox" style="display:none;">
-                            <div class="preview-img-wrap">
-                                <img id="receiptImagePreview" alt="Receipt preview">
-                            </div>
-                            <div class="preview-meta">
-                                <strong id="receiptFileName">receipt.jpg</strong>
-                                <span id="receiptFileSize">0 KB</span>
-                                <div class="ocr-badge" id="ocrStatusBadge">
-                                    <i class="fa-solid fa-sparkles"></i> Ready to scan
-                                </div>
-                                <button type="button" class="btn-remove-receipt" id="btnRemoveReceipt">
-                                    <i class="fa-solid fa-trash-can"></i> Remove Photo
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="extracted-alert" id="extractedAlert" style="display:none;">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i>
-                        <span id="extractedAlertText">Extracted from photo! Auto-filled amount &amp; merchant.</span>
-                    </div>
-                </div>
-
                 <div class="expense-field">
 
                     <label for="expenseTitle">
@@ -557,58 +521,83 @@
         </div>
 
 
-        <aside class="expense-preview-card">
+        
+        <div class="expense-sidebar">
 
-            <div class="preview-icon">
-                <i class="fa-solid fa-receipt"></i>
+            <div class="expense-preview-card receipt-card-top" style="margin-bottom: 22px;">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+                    <div class="preview-icon" style="margin:0; width:38px; height:38px; font-size:16px;">
+                        <i class="fa-solid fa-camera"></i>
+                    </div>
+                    <div>
+                        <span class="section-tag" style="margin:0; font-size:10px;">MULTER &amp; OCR</span>
+                        <h3 style="margin:2px 0 0; color:#f8fafc; font-size:16px;">Receipt Photo Scanner</h3>
+                    </div>
+                </div>
+                <p style="font-size:12px; color:#94a3b8; margin:0 0 14px;">
+                    Drop your bill or receipt photo here. Split Bro automatically extracts the total amount, store name, category, and date.
+                </p>
+
+                <div class="receipt-drop-box" id="receiptDropZone">
+                    <input type="file" id="receiptFileInput" name="receipt" accept="image/jpeg,image/png,image/webp,application/pdf" style="display:none;">
+                    <div class="drop-content" id="dropContent">
+                        <div class="drop-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                        <h4 style="font-size:14px; margin-bottom:4px;">Drag &amp; Drop Bill Photo</h4>
+                        <p style="font-size:11px; margin-bottom:12px;">Supports JPG, PNG, WEBP (Max 5MB)</p>
+                        <button type="button" class="btn-browse-photo" id="btnBrowseReceipt">
+                            <i class="fa-solid fa-image"></i> Browse Photo
+                        </button>
+                    </div>
+                    <div class="receipt-preview-box" id="receiptPreviewBox" style="display:none;">
+                        <div class="preview-img-wrap">
+                            <img id="receiptImagePreview" alt="Receipt preview">
+                        </div>
+                        <div class="preview-meta">
+                            <strong id="receiptFileName">receipt.jpg</strong>
+                            <span id="receiptFileSize">0 KB</span>
+                            <div class="ocr-badge" id="ocrStatusBadge">
+                                <i class="fa-solid fa-sparkles"></i> Ready
+                            </div>
+                            <button type="button" class="btn-remove-receipt" id="btnRemoveReceipt">
+                                <i class="fa-solid fa-trash-can"></i> Remove Photo
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="extracted-alert" id="extractedAlert" style="display:none; margin-top:12px;">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span id="extractedAlertText">Extracted from photo! Auto-filled fields.</span>
+                </div>
+
+                <div style="margin-top:12px; padding:10px; border-radius:8px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.05); font-size:11px; color:#64748b;">
+                    <i class="fa-solid fa-circle-info" style="color:#38bdf8;"></i> Uploaded photos are stored in <code>server/uploads/receipts/</code> via Multer and linked to MongoDB Atlas.
+                </div>
             </div>
 
-            <span class="section-tag">
-                SPLIT BRO
-            </span>
+            <aside class="expense-preview-card">
+                <div class="preview-icon">
+                    <i class="fa-solid fa-receipt"></i>
+                </div>
+                <span class="section-tag">SPLIT BRO</span>
+                <h2>Make every expense count.</h2>
+                <p>Split Bro calculates everyone's share and creates the simplest settlement plan.</p>
+                <div class="preview-item">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>Fair splitting &bull; Equal, % &amp; Custom</span>
+                </div>
+                <div class="preview-item">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>Automated receipt attachment</span>
+                </div>
+                <div class="preview-item">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>Greedy debt simplification</span>
+                </div>
+            </aside>
 
-            <h2>
-                Make every expense count.
-            </h2>
+        </div>
 
-            <p>
-                Split Bro will calculate everyone's share and use it later to create the simplest settlement plan.
-            </p>
-
-
-            <div class="preview-item">
-
-                <i class="fa-solid fa-circle-check"></i>
-
-                <span>
-                    Fair splitting
-                </span>
-
-            </div>
-
-
-            <div class="preview-item">
-
-                <i class="fa-solid fa-circle-check"></i>
-
-                <span>
-                    Category tracking
-                </span>
-
-            </div>
-
-
-            <div class="preview-item">
-
-                <i class="fa-solid fa-circle-check"></i>
-
-                <span>
-                    Automatic balance calculation
-                </span>
-
-            </div>
-
-        </aside>
 
 
     </section>
