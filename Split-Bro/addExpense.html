@@ -204,15 +204,13 @@
     </section>
 
 
-    <section class="expense-layout" style="display:grid; grid-template-columns:minmax(340px, 1.15fr) minmax(320px, 1fr); gap:26px; align-items:start;">
+    <section class="expense-layout" style="display:grid; grid-template-columns:1.15fr 1fr; gap:26px; align-items:start;">
 
-
+        <!-- LEFT COLUMN: EXPENSE FORM -->
         <div class="expense-form-card">
 
             <form id="expenseForm">
 
-
-                
                 <div class="expense-field">
                     <label for="expenseGroupSelect">
                         <i class="fa-solid fa-users" style="color:#38bdf8;margin-right:6px;"></i> Select Group
@@ -227,378 +225,203 @@
                 </div>
 
                 <div class="expense-field">
-
                     <label for="expenseTitle">
-                        Expense Name
+                        <i class="fa-solid fa-pen" style="color:#38bdf8;margin-right:6px;"></i> Expense Name
                     </label>
-
                     <div class="expense-input">
-
                         <i class="fa-solid fa-pen"></i>
-
-                        <input
-                            type="text"
-                            id="expenseTitle"
-                            placeholder="Example: Dinner"
-                            autocomplete="off"
-                        >
-
+                        <input type="text" id="expenseTitle" placeholder="Example: Dinner at Cafe" autocomplete="off">
                     </div>
-
-                    <span
-                        class="expense-error"
-                        id="titleError"
-                    ></span>
-
+                    <span class="expense-error" id="titleError"></span>
                 </div>
 
+                <div class="expense-two-columns">
+                    <div class="expense-field">
+                        <label for="expenseAmount">
+                            <i class="fa-solid fa-indian-rupee-sign" style="color:#10b981;margin-right:6px;"></i> Amount
+                        </label>
+                        <div class="expense-input">
+                            <i class="fa-solid fa-indian-rupee-sign"></i>
+                            <input type="number" id="expenseAmount" placeholder="0.00" min="1" step="0.01">
+                        </div>
+                        <span class="expense-error" id="amountError"></span>
+                    </div>
+
+                    <div class="expense-field">
+                        <label for="expenseCategory">
+                            <i class="fa-solid fa-layer-group" style="color:#38bdf8;margin-right:6px;"></i> Category
+                        </label>
+                        <div class="expense-input">
+                            <i class="fa-solid fa-layer-group"></i>
+                            <select id="expenseCategory">
+                                <option value="">Select category</option>
+                                <option value="Food">Food</option>
+                                <option value="Hotel">Hotel</option>
+                                <option value="Transport">Transport</option>
+                                <option value="Activities">Activities</option>
+                                <option value="Shopping">Shopping</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <span class="expense-error" id="categoryError"></span>
+                    </div>
+                </div>
 
                 <div class="expense-two-columns">
-
                     <div class="expense-field">
-
-                        <label for="expenseAmount">
-                            Amount
+                        <label for="expenseDate">
+                            <i class="fa-solid fa-calendar-days" style="color:#38bdf8;margin-right:6px;"></i> Expense Date
                         </label>
-
-                        <div class="expense-input">
-
-                            <i class="fa-solid fa-indian-rupee-sign"></i>
-
-                            <input
-                                type="number"
-                                id="expenseAmount"
-                                placeholder="0.00"
-                                min="1"
-                                step="0.01"
-                            >
-
-                        </div>
-
-                        <span
-                            class="expense-error"
-                            id="amountError"
-                        ></span>
-
-                    </div>
-
-
-                    <div class="expense-field">
-
-                        <label for="expenseCategory">
-                            Category
-                        </label>
-
-                        <div class="expense-input">
-
-                            <i class="fa-solid fa-layer-group"></i>
-
-                            <select id="expenseCategory">
-
-                                <option value="">
-                                    Select category
-                                </option>
-
-                                <option value="Food">
-                                    Food
-                                </option>
-
-                                <option value="Hotel">
-                                    Hotel
-                                </option>
-
-                                <option value="Transport">
-                                    Transport
-                                </option>
-
-                                <option value="Activities">
-                                    Activities
-                                </option>
-
-                                <option value="Shopping">
-                                    Shopping
-                                </option>
-
-                                <option value="Other">
-                                    Other
-                                </option>
-
-                            </select>
-
-                        </div>
-
-                        <span
-                            class="expense-error"
-                            id="categoryError"
-                        ></span>
-
-                    </div>
-
-                
-                    <div class="expense-field">
-                        <label for="expenseDate">Expense Date</label>
                         <div class="expense-input">
                             <i class="fa-solid fa-calendar-days"></i>
                             <input type="date" id="expenseDate">
                         </div>
                     </div>
 
-                <div class="expense-field">
-
-                    <label for="expensePayer">
-                        Paid By
-                    </label>
-
-                    <div class="expense-input">
-
-                        <i class="fa-solid fa-user"></i>
-
-                        <select id="expensePayer"></select>
-
+                    <div class="expense-field">
+                        <label for="expensePayer">
+                            <i class="fa-solid fa-user" style="color:#38bdf8;margin-right:6px;"></i> Paid By
+                        </label>
+                        <div class="expense-input">
+                            <i class="fa-solid fa-user"></i>
+                            <select id="expensePayer"></select>
+                        </div>
+                        <span class="expense-error" id="payerError"></span>
                     </div>
-
-                    <span
-                        class="expense-error"
-                        id="payerError"
-                    ></span>
-
                 </div>
-
 
                 <div class="split-section">
-
                     <div class="split-heading">
-
                         <div>
-
-                            <h2>
-                                Split Among
-                            </h2>
-
-                            <p>
-                                Select the members sharing this expense.
-                            </p>
-
+                            <h2>Split Among</h2>
+                            <p>Select the members sharing this expense.</p>
                         </div>
-
-                        <button
-                            type="button"
-                            id="selectAllMembers"
-                        >
-                            Select All
-                        </button>
-
+                        <button type="button" id="selectAllMembers">Select All</button>
                     </div>
 
-
-                    <div
-                        id="splitMembers"
-                        class="split-members"
-                    ></div>
-
-                    <span
-                        class="expense-error"
-                        id="membersError"
-                    ></span>
-
+                    <div id="splitMembers" class="split-members"></div>
+                    <span class="expense-error" id="membersError"></span>
                 </div>
-
 
                 <div class="split-type-section">
-
-                    <h2>
-                        Split Type
-                    </h2>
-
+                    <h2>Split Type</h2>
                     <div class="split-type-options">
-
                         <label class="split-option">
-
-                            <input
-                                type="radio"
-                                name="splitType"
-                                value="equal"
-                                checked
-                            >
-
-                            <span>
-                                <i class="fa-solid fa-equals"></i>
-                                Equal
-                            </span>
-
+                            <input type="radio" name="splitType" value="equal" checked>
+                            <span><i class="fa-solid fa-equals"></i> Equal</span>
                         </label>
-
-
                         <label class="split-option">
-
-                            <input
-                                type="radio"
-                                name="splitType"
-                                value="percentage"
-                            >
-
-                            <span>
-                                <i class="fa-solid fa-percent"></i>
-                                Percentage
-                            </span>
-
+                            <input type="radio" name="splitType" value="percentage">
+                            <span><i class="fa-solid fa-percent"></i> Percentage</span>
                         </label>
-
-
                         <label class="split-option">
-
-                            <input
-                                type="radio"
-                                name="splitType"
-                                value="custom"
-                            >
-
-                            <span>
-                                <i class="fa-solid fa-sliders"></i>
-                                Custom
-                            </span>
-
+                            <input type="radio" name="splitType" value="custom">
+                            <span><i class="fa-solid fa-sliders"></i> Custom</span>
                         </label>
-
                     </div>
-
                 </div>
 
+                <div id="splitValues" class="split-values"></div>
 
-                <div
-                    id="splitValues"
-                    class="split-values"
-                ></div>
-
-
-                <div
-                    id="splitSummary"
-                    class="split-summary"
-                >
-
-                    <span>
-                        Your split
-                    </span>
-
-                    <strong>
-                        ₹0.00
-                    </strong>
-
+                <div id="splitSummary" class="split-summary">
+                    <span>Your split</span>
+                    <strong>₹0.00</strong>
                 </div>
 
-
-                <span
-                    class="expense-error form-error"
-                    id="formError"
-                ></span>
-
+                <span class="expense-error form-error" id="formError"></span>
 
                 <div class="expense-actions">
-
-                    <a
-                        href="dashboard.html"
-                        class="expense-cancel"
-                    >
-                        Cancel
-                    </a>
-
-                    <button
-                        type="submit"
-                        class="expense-submit"
-                    >
-
-                        <i class="fa-solid fa-check"></i>
-
-                        Add Expense
-
+                    <a href="dashboard.html" class="expense-cancel">Cancel</a>
+                    <button type="submit" class="expense-submit">
+                        <i class="fa-solid fa-check"></i> Add Expense
                     </button>
-
                 </div>
-
 
             </form>
 
         </div>
 
-
-        
+        <!-- RIGHT COLUMN: RECEIPT SCANNER & PREVIEW (Direct Child of Grid) -->
         <div class="expense-sidebar" style="display:flex; flex-direction:column; gap:20px;">
 
-            <div class="expense-preview-card receipt-card-top" style="display:block !important; padding:24px; border-radius:20px; background:rgba(10,20,39,0.85); border:1px solid rgba(255,255,255,0.08);">
-                <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
-                    <div class="preview-icon" style="margin:0; width:38px; height:38px; font-size:16px;">
+            <!-- RECEIPT PHOTO SCANNER (MULTER & OCR) -->
+            <div class="expense-preview-card" style="padding:24px; border-radius:20px; background:rgba(10,20,39,0.85); border:1px solid rgba(255,255,255,0.08); box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
+                    <div class="preview-icon" style="margin:0; width:42px; height:42px; font-size:18px; background:rgba(16,185,129,0.15); color:#10b981; display:flex; align-items:center; justify-content:center; border-radius:12px;">
                         <i class="fa-solid fa-camera"></i>
                     </div>
                     <div>
-                        <span class="section-tag" style="margin:0; font-size:10px;">MULTER &amp; OCR</span>
-                        <h3 style="margin:2px 0 0; color:#f8fafc; font-size:16px;">Receipt Photo Scanner</h3>
+                        <span class="section-tag" style="margin:0; font-size:10px; color:#10b981;">MULTER UPLOAD &amp; OCR</span>
+                        <h3 style="margin:2px 0 0; color:#f8fafc; font-size:17px; font-weight:700;">Bill Photo Scanner</h3>
                     </div>
                 </div>
-                <p style="font-size:12px; color:#94a3b8; margin:0 0 14px;">
-                    Drop your bill or receipt photo here. Split Bro automatically extracts the total amount, store name, category, and date.
+
+                <p style="font-size:12px; color:#94a3b8; margin:0 0 14px; line-height:1.5;">
+                    Upload a receipt or bill photo. Split Bro automatically extracts the total amount, store name, category, and date.
                 </p>
 
-                <div class="receipt-drop-box" id="receiptDropZone">
+                <div class="receipt-drop-box" id="receiptDropZone" style="border:2px dashed rgba(56,189,248,0.4); background:rgba(15,23,42,0.6); border-radius:14px; padding:20px; text-align:center; cursor:pointer;">
                     <input type="file" id="receiptFileInput" name="receipt" accept="image/jpeg,image/png,image/webp,application/pdf" style="display:none;">
                     <div class="drop-content" id="dropContent">
-                        <div class="drop-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
-                        <h4 style="font-size:14px; margin-bottom:4px;">Drag &amp; Drop Bill Photo</h4>
-                        <p style="font-size:11px; margin-bottom:12px;">Supports JPG, PNG, WEBP (Max 5MB)</p>
-                        <button type="button" class="btn-browse-photo" id="btnBrowseReceipt">
-                            <i class="fa-solid fa-image"></i> Browse Photo
+                        <div class="drop-icon" style="font-size:32px; color:#38bdf8; margin-bottom:8px;"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                        <h4 style="font-size:14px; margin:0 0 4px; color:#f8fafc;">Click or Drag &amp; Drop Bill Photo</h4>
+                        <p style="font-size:11px; margin:0 0 12px; color:#94a3b8;">Supports JPG, PNG, WEBP &bull; Max 5MB</p>
+                        <button type="button" class="btn-browse-photo" id="btnBrowseReceipt" style="background:#0284c7; color:#fff; border:none; padding:8px 16px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer;">
+                            <i class="fa-solid fa-image"></i> Browse Receipt Photo
                         </button>
                     </div>
-                    <div class="receipt-preview-box" id="receiptPreviewBox" style="display:none;">
-                        <div class="preview-img-wrap">
-                            <img id="receiptImagePreview" alt="Receipt preview">
+
+                    <div class="receipt-preview-box" id="receiptPreviewBox" style="display:none; align-items:center; gap:14px; text-align:left; background:rgba(30,41,59,0.7); padding:12px; border-radius:10px;">
+                        <div class="preview-img-wrap" style="width:75px; height:75px; border-radius:8px; overflow:hidden; background:#090d16; border:1px solid rgba(255,255,255,0.1); flex-shrink:0;">
+                            <img id="receiptImagePreview" alt="Receipt preview" style="width:100%; height:100%; object-fit:cover;">
                         </div>
-                        <div class="preview-meta">
-                            <strong id="receiptFileName">receipt.jpg</strong>
-                            <span id="receiptFileSize">0 KB</span>
-                            <div class="ocr-badge" id="ocrStatusBadge">
-                                <i class="fa-solid fa-sparkles"></i> Ready
+                        <div class="preview-meta" style="flex:1; display:flex; flex-direction:column; gap:4px;">
+                            <strong id="receiptFileName" style="color:#f8fafc; font-size:13px;">receipt.jpg</strong>
+                            <span id="receiptFileSize" style="color:#94a3b8; font-size:11px;">0 KB</span>
+                            <div class="ocr-badge" id="ocrStatusBadge" style="display:inline-flex; align-items:center; gap:5px; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:600; background:rgba(16,185,129,0.15); color:#34d399; width:fit-content;">
+                                <i class="fa-solid fa-sparkles"></i> Ready to scan
                             </div>
-                            <button type="button" class="btn-remove-receipt" id="btnRemoveReceipt">
+                            <button type="button" class="btn-remove-receipt" id="btnRemoveReceipt" style="background:none; border:none; color:#f87171; font-size:11px; cursor:pointer; padding:0; margin-top:2px; text-align:left;">
                                 <i class="fa-solid fa-trash-can"></i> Remove Photo
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <div class="extracted-alert" id="extractedAlert" style="display:none; margin-top:12px;">
+                <div class="extracted-alert" id="extractedAlert" style="display:none; margin-top:12px; padding:10px 14px; border-radius:10px; background:rgba(16,185,129,0.15); border:1px solid #10b981; color:#a7f3d0; font-size:12px; align-items:center; gap:8px;">
                     <i class="fa-solid fa-wand-magic-sparkles"></i>
-                    <span id="extractedAlertText">Extracted from photo! Auto-filled fields.</span>
+                    <span id="extractedAlertText">Extracted from photo! Auto-filled amount &amp; merchant.</span>
                 </div>
 
                 <div style="margin-top:12px; padding:10px; border-radius:8px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.05); font-size:11px; color:#64748b;">
-                    <i class="fa-solid fa-circle-info" style="color:#38bdf8;"></i> Uploaded photos are stored in <code>server/uploads/receipts/</code> via Multer and linked to MongoDB Atlas.
+                    <i class="fa-solid fa-circle-info" style="color:#38bdf8;"></i> Handled via Multer (multipart/form-data) and stored in <code>server/uploads/receipts/</code>.
                 </div>
             </div>
 
-            <aside class="expense-preview-card" style="display:block !important; padding:24px; border-radius:20px; background:rgba(10,20,39,0.85); border:1px solid rgba(255,255,255,0.08);">
-                <div class="preview-icon">
+            <!-- INFO / SPLIT FEATURE CARD -->
+            <aside class="expense-preview-card" style="padding:24px; border-radius:20px; background:rgba(10,20,39,0.85); border:1px solid rgba(255,255,255,0.08);">
+                <div class="preview-icon" style="margin-bottom:12px; font-size:20px; color:#38bdf8;">
                     <i class="fa-solid fa-receipt"></i>
                 </div>
-                <span class="section-tag">SPLIT BRO</span>
-                <h2>Make every expense count.</h2>
-                <p>Split Bro calculates everyone's share and creates the simplest settlement plan.</p>
-                <div class="preview-item">
-                    <i class="fa-solid fa-circle-check"></i>
+                <span class="section-tag" style="font-size:10px;">SPLIT BRO</span>
+                <h2 style="font-size:18px; margin:6px 0 8px; color:#f8fafc;">Make every expense count.</h2>
+                <p style="font-size:12px; color:#94a3b8; margin:0 0 16px; line-height:1.5;">Split Bro calculates everyone's share and uses it to generate the simplest settlement plan.</p>
+
+                <div class="preview-item" style="display:flex; align-items:center; gap:8px; margin-bottom:8px; font-size:12px; color:#cbd5e1;">
+                    <i class="fa-solid fa-circle-check" style="color:#10b981;"></i>
                     <span>Fair splitting &bull; Equal, % &amp; Custom</span>
                 </div>
-                <div class="preview-item">
-                    <i class="fa-solid fa-circle-check"></i>
-                    <span>Automated receipt attachment</span>
+                <div class="preview-item" style="display:flex; align-items:center; gap:8px; margin-bottom:8px; font-size:12px; color:#cbd5e1;">
+                    <i class="fa-solid fa-circle-check" style="color:#10b981;"></i>
+                    <span>Automatic receipt attachment</span>
                 </div>
-                <div class="preview-item">
-                    <i class="fa-solid fa-circle-check"></i>
+                <div class="preview-item" style="display:flex; align-items:center; gap:8px; font-size:12px; color:#cbd5e1;">
+                    <i class="fa-solid fa-circle-check" style="color:#10b981;"></i>
                     <span>Greedy debt simplification</span>
                 </div>
             </aside>
 
         </div>
-
-
 
     </section>
 
