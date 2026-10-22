@@ -7,6 +7,7 @@ const { validateExpense } = require('../middleware/validator');
 
 router.get('/', protect, expenseController.getExpenses);
 router.get('/export/csv', protect, expenseController.exportExpensesCsv);
+router.post('/scan-receipt', protect, uploadReceipt.single('receipt'), verifyReceiptContent, expenseController.scanReceipt);
 router.get('/receipts/:filename', protect, expenseController.getReceipt);
 router.post('/', protect, uploadReceipt.single('receipt'), verifyReceiptContent, validateExpense, expenseController.createExpense);
 router.get('/:id', protect, expenseController.getExpenseById);

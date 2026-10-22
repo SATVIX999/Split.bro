@@ -627,6 +627,23 @@
 
         <div class="quick-actions-grid">
 
+            <div class="quick-card" id="btnExportCsvCard" style="cursor:pointer;">
+                <div class="quick-icon" style="background:rgba(16, 185, 129, 0.2);color:#10b981;">
+                    <i class="fa-solid fa-file-csv"></i>
+                </div>
+                <h3>Export to CSV</h3>
+                <p>Stream expense report using Node.js stream pipeline (Lectures 32 & 34).</p>
+            </div>
+
+            <div class="quick-card" id="btnSystemHealthCard" style="cursor:pointer;">
+                <div class="quick-icon" style="background:rgba(56, 189, 248, 0.2);color:#38bdf8;">
+                    <i class="fa-solid fa-server"></i>
+                </div>
+                <h3>Server & V8 Heap</h3>
+                <p>Inspect Node.js V8 memory heap and MongoDB status (Lectures 31 & 35).</p>
+            </div>
+
+
 
             <a
                 href="groups.html"
@@ -1042,6 +1059,59 @@
 <script src="js/storage.js"></script>
 <script src="js/dashboard.js"></script>
 <script src="js/app.js"></script>
+
+
+<!-- ================= RECEIPT VIEW MODAL ================= -->
+<div id="receiptModal" class="modal-overlay" style="display:none;">
+    <div class="modal-card receipt-modal-content">
+        <div class="modal-header">
+            <h3 id="receiptModalTitle"><i class="fa-solid fa-receipt"></i> Bill / Receipt Photo</h3>
+            <button type="button" class="modal-close-btn" id="closeReceiptModal">&times;</button>
+        </div>
+        <div class="modal-body" style="text-align:center;padding:16px;">
+            <div style="max-height:480px;overflow:auto;border-radius:10px;background:#090d16;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.1);">
+                <img id="receiptModalImg" src="" alt="Receipt Photo" style="max-width:100%;max-height:450px;object-fit:contain;">
+            </div>
+            <div style="margin-top:14px;display:flex;justify-content:space-between;align-items:center;">
+                <span id="receiptModalMeta" style="font-size:12px;color:#94a3b8;">Uploaded via Multer</span>
+                <a id="receiptDownloadLink" href="#" target="_blank" class="primary-button small-button" style="text-decoration:none;">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Full Image
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ================= SYSTEM DIAGNOSTICS MODAL ================= -->
+<div id="diagnosticsModal" class="modal-overlay" style="display:none;">
+    <div class="modal-card diagnostics-modal-content">
+        <div class="modal-header">
+            <h3><i class="fa-solid fa-microchip" style="color:#38bdf8;"></i> System Diagnostics &amp; V8 Engine</h3>
+            <button type="button" class="modal-close-btn" id="closeDiagnosticsModal">&times;</button>
+        </div>
+        <div class="modal-body" style="padding:20px;">
+            <div class="diag-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+                <div class="diag-stat" style="background:#090d16;padding:12px;border-radius:8px;border:1px solid #1e293b;">
+                    <span style="font-size:11px;color:#94a3b8;display:block;">EXPRESS BACKEND</span>
+                    <strong id="diagStatus" style="color:#10b981;font-size:16px;">Active (Online)</strong>
+                </div>
+                <div class="diag-stat" style="background:#090d16;padding:12px;border-radius:8px;border:1px solid #1e293b;">
+                    <span style="font-size:11px;color:#94a3b8;display:block;">MONGODB ATLAS</span>
+                    <strong id="diagDbStatus" style="color:#10b981;font-size:16px;">Connected</strong>
+                </div>
+                <div class="diag-stat" style="background:#090d16;padding:12px;border-radius:8px;border:1px solid #1e293b;">
+                    <span style="font-size:11px;color:#94a3b8;display:block;">V8 HEAP USED</span>
+                    <strong id="diagHeapUsed" style="color:#38bdf8;font-size:16px;">-- MB</strong>
+                </div>
+                <div class="diag-stat" style="background:#090d16;padding:12px;border-radius:8px;border:1px solid #1e293b;">
+                    <span style="font-size:11px;color:#94a3b8;display:block;">V8 TOTAL HEAP</span>
+                    <strong id="diagHeapTotal" style="color:#a78bfa;font-size:16px;">-- MB</strong>
+                </div>
+            </div>
+            <pre id="diagJson" style="background:#050811;color:#a5f3fc;padding:12px;border-radius:8px;font-size:11px;max-height:180px;overflow:auto;margin:0;">// Fetching /api/health ...</pre>
+        </div>
+    </div>
+</div>
 
 </body>
 

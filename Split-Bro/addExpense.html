@@ -212,6 +212,56 @@
             <form id="expenseForm">
 
 
+                
+                <div class="expense-field">
+                    <label for="expenseGroupSelect">
+                        <i class="fa-solid fa-users" style="color:#38bdf8;margin-right:6px;"></i> Select Group
+                    </label>
+                    <div class="expense-input">
+                        <i class="fa-solid fa-layer-group"></i>
+                        <select id="expenseGroupSelect">
+                            <option value="">-- Choose Group --</option>
+                        </select>
+                    </div>
+                    <span class="expense-error" id="groupError"></span>
+                </div>
+
+                <div class="expense-field receipt-upload-field">
+                    <label>
+                        <i class="fa-solid fa-camera" style="color:#10b981;margin-right:6px;"></i> Bill / Receipt Photo (Multer Upload &amp; OCR Extraction)
+                    </label>
+                    <div class="receipt-drop-box" id="receiptDropZone">
+                        <input type="file" id="receiptFileInput" name="receipt" accept="image/jpeg,image/png,image/webp,application/pdf" style="display:none;">
+                        <div class="drop-content" id="dropContent">
+                            <div class="drop-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                            <h4>Click or Drag &amp; Drop Bill Photo</h4>
+                            <p>Upload receipt (JPG, PNG, WEBP) &bull; Automatically extracts total &amp; merchant</p>
+                            <button type="button" class="btn-browse-photo" id="btnBrowseReceipt">
+                                <i class="fa-solid fa-image"></i> Browse Receipt Photo
+                            </button>
+                        </div>
+                        <div class="receipt-preview-box" id="receiptPreviewBox" style="display:none;">
+                            <div class="preview-img-wrap">
+                                <img id="receiptImagePreview" alt="Receipt preview">
+                            </div>
+                            <div class="preview-meta">
+                                <strong id="receiptFileName">receipt.jpg</strong>
+                                <span id="receiptFileSize">0 KB</span>
+                                <div class="ocr-badge" id="ocrStatusBadge">
+                                    <i class="fa-solid fa-sparkles"></i> Ready to scan
+                                </div>
+                                <button type="button" class="btn-remove-receipt" id="btnRemoveReceipt">
+                                    <i class="fa-solid fa-trash-can"></i> Remove Photo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="extracted-alert" id="extractedAlert" style="display:none;">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span id="extractedAlertText">Extracted from photo! Auto-filled amount &amp; merchant.</span>
+                    </div>
+                </div>
+
                 <div class="expense-field">
 
                     <label for="expenseTitle">
@@ -320,8 +370,14 @@
 
                     </div>
 
-                </div>
-
+                
+                    <div class="expense-field">
+                        <label for="expenseDate">Expense Date</label>
+                        <div class="expense-input">
+                            <i class="fa-solid fa-calendar-days"></i>
+                            <input type="date" id="expenseDate">
+                        </div>
+                    </div>
 
                 <div class="expense-field">
 
@@ -560,6 +616,7 @@
 </main>
 
 
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script src="js/storage.js"></script>
 <script src="js/expense.js"></script>
 <script src="js/app.js"></script>

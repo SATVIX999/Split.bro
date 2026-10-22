@@ -1273,34 +1273,33 @@ async function saveGroups() {
         renderGroups();
     }
 
-    async function loadGroupsFromBackend() {
-    try {
-        const response = await fetch("http://localhost:3000/api/groups");
+        async function loadGroupsFromBackend() {
+        const token = localStorage.getItem("token") || "";
+        try {
+            const response = await fetch("/api/groups", {
+                headers: token ? { "Authorization": "Bearer " + token } : {}
+            });
 
-        if (!response.ok) {
-            throw new Error("Failed to load groups");
+            if (!response.ok) {
+                throw new Error("Failed to load groups: " + response.status);
+            }
+
+            const serverGroups = await response.json();
+            groups = serverGroups;
+
+            localStorage.setItem(
+                "smartSettleGroups",
+                JSON.stringify(serverGroups)
+            );
+
+            renderGroups();
+        } catch (error) {
+            console.warn("Could not load groups from backend:", error);
+            groups = JSON.parse(
+                localStorage.getItem("smartSettleGroups") || "[]"
+            );
+            renderGroups();
         }
-
-        const serverGroups = await response.json();
-
-        groups = serverGroups;
-
-        localStorage.setItem(
-            "smartSettleGroups",
-            JSON.stringify(serverGroups)
-        );
-
-        renderGroups();
-
-        console.log("Groups loaded successfully:", serverGroups);
-    } catch (error) {
-        console.error("Could not load groups:", error);
-
-        groups = JSON.parse(
-            localStorage.getItem("smartSettleGroups") || "[]"
-        );
-
-        renderGroups();
     }
 }
 

@@ -1,10 +1,12 @@
+// Split Bro - Real Backend Authentication Controller (Lectures 37-40)
 let signupForm = document.getElementById("signupForm");
 let loginForm = document.getElementById("loginForm");
+let btnQuickDemoLogin = document.getElementById("btnQuickDemoLogin");
 
 let generateUserId = (name) => {
     let cleanName = name.trim().replace(/\s+/g, "").toUpperCase();
     let base = cleanName.substring(0, 6);
-    let users = getUsers();
+    let users = typeof getUsers === "function" ? getUsers() : [];
     let userId = base + "01";
     let number = 1;
 
@@ -16,13 +18,14 @@ let generateUserId = (name) => {
     return userId;
 };
 
+// SIGNUP HANDLER
 if (signupForm) {
-    signupForm.addEventListener("submit", (event) => {
+    signupForm.addEventListener("submit", async (event) => {
         event.preventDefault();
 
         let name = document.getElementById("signupName").value.trim();
         let email = document.getElementById("signupEmail").value.trim().toLowerCase();
-        let userIdInput = document.getElementById("signupUserId").value.trim().toUpperCase();
+        let userIdInput = document.getElementById("signupUserId") ? document.getElementById("signupUserId").value.trim().toUpperCase() : "";
         let password = document.getElementById("signupPassword").value;
 
         let nameError = document.getElementById("nameError");
@@ -31,134 +34,158 @@ if (signupForm) {
         let passwordError = document.getElementById("passwordError");
         let signupMessage = document.getElementById("signupMessage");
 
-        nameError.textContent = "";
-        emailError.textContent = "";
-        userIdError.textContent = "";
-        passwordError.textContent = "";
-        signupMessage.textContent = "";
-        signupMessage.className = "auth-message";
+        if (nameError) nameError.textContent = "";
+        if (emailError) emailError.textContent = "";
+        if (userIdError) userIdError.textContent = "";
+        if (passwordError) passwordError.textContent = "";
+        if (signupMessage) {
+            signupMessage.textContent = "";
+            signupMessage.className = "auth-message";
+        }
 
-        let users = getUsers();
         let valid = true;
 
         if (name.length < 2) {
-            nameError.textContent = "Enter a valid name.";
+            if (nameError) nameError.textContent = "Enter a valid name (at least 2 characters).";
             valid = false;
         }
 
         if (!email.includes("@") || !email.includes(".")) {
-            emailError.textContent = "Enter a valid email.";
+            if (emailError) emailError.textContent = "Enter a valid email address.";
             valid = false;
         }
 
-        let existingEmail = users.some(user => user.email === email);
-
-        if (existingEmail) {
-            emailError.textContent = "This email is already registered.";
+        if (password.length < 6) {
+            if (passwordError) passwordError.textContent = "Password must be at least 6 characters.";
             valid = false;
         }
 
-        let userId = userIdInput;
+        if (!valid) return;
 
-        if (userId.length < 4) {
-    userIdError.textContent = "User ID must contain at least 4 characters.";
-    valid = false;
-}
-
-        let userIdPattern = /^[A-Z0-9_]+$/;
-
-        if (!userIdPattern.test(userId)) {
-        userIdError.textContent = "Use only letters, numbers and underscore.";
-        valid = false;
-}
-
-        let existingUserId = users.some(
-        user => user.userId.toUpperCase() === userId
-);
-
-        if (existingUserId) {
-    userIdError.textContent = "This User ID is already taken.";
-    valid = false;
-}
-
-        let passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[_\W]).{6,}$/;
-
-        if (!passwordPattern.test(password)) {
-        passwordError.textContent = "Use 6+ characters with uppercase, lowercase, number and symbol/underscore.";
-        valid = false;
+        const submitBtn = signupForm.querySelector(".auth-submit");
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating Account...';
         }
 
-        if (!valid) {
-            return;
+        try {
+            const res = await fetch("/api/auth/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name,
+                    email,
+                    userId: userIdInput || undefined,
+                    password
+                })
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.message || "Registration failed");
+            }
+
+            if (data.token) {
+                localStorage.setItem("token", data.token);
+                localStorage.setItem("currentUser", JSON.stringify(data.user));
+                localStorage.setItem("smartSettleCurrentUser", JSON.stringify(data.user));
+            }
+
+            if (signupMessage) {
+                signupMessage.textContent = "Account created successfully! Redirecting...";
+                signupMessage.className = "auth-message success";
+            }
+
+            setTimeout(() => {
+                window.location.href = "dashboard.html";
+            }, 800);
+        } catch (err) {
+            if (signupMessage) {
+                signupMessage.textContent = err.message;
+                signupMessage.className = "auth-message error";
+            }
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Sign Up <i class="fa-solid fa-arrow-right"></i>';
+            }
         }
-
-        let newUser = {
-            userId: userId,
-            name: name,
-            email: email,
-            password: password,
-            groups: [],
-            createdAt: new Date().toISOString()
-        };
-
-        users.push(newUser);
-        saveUsers(users);
-
-        signupMessage.textContent = "Account created successfully! Your User ID is " + userId;
-        signupMessage.className = "auth-message success";
-
-        signupForm.reset();
-
-        setTimeout(() => {
-            window.location.href = "login.html";
-        }, 1800);
     });
 }
 
+// LOGIN HANDLER
 if (loginForm) {
-    loginForm.addEventListener("submit", (event) => {
+    loginForm.addEventListener("submit", async (event) => {
         event.preventDefault();
 
-        let loginId = document.getElementById("loginId").value.trim().toLowerCase();
+        let loginId = document.getElementById("loginId").value.trim();
         let password = document.getElementById("loginPassword").value;
-
         let loginMessage = document.getElementById("loginMessage");
 
-        loginMessage.textContent = "";
-        loginMessage.className = "auth-message";
-
-        let users = getUsers();
-
-        let user = users.find(item =>
-            item.email.toLowerCase() === loginId ||
-            item.userId.toLowerCase() === loginId
-        );
-
-        if (!user) {
-            loginMessage.textContent = "User ID or email not found.";
-            loginMessage.className = "auth-message error";
-            return;
+        if (loginMessage) {
+            loginMessage.textContent = "";
+            loginMessage.className = "auth-message";
         }
 
-        if (user.password !== password) {
-            loginMessage.textContent = "Incorrect password.";
-            loginMessage.className = "auth-message error";
-            return;
+        const submitBtn = loginForm.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Authenticating...';
         }
 
-        saveCurrentUser({
-            userId: user.userId,
-            name: user.name,
-            email: user.email,
-            groups: user.groups
-        });
+        try {
+            const res = await fetch("/api/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    identifier: loginId,
+                    password: password
+                })
+            });
 
-        loginMessage.textContent = "Login successful! Redirecting...";
-        loginMessage.className = "auth-message success";
+            const data = await res.json();
 
-        setTimeout(() => {
-            window.location.href = "dashboard.html";
-        }, 1000);
+            if (!res.ok) {
+                throw new Error(data.message || "Invalid credentials");
+            }
+
+            if (data.token) {
+                localStorage.setItem("token", data.token);
+                localStorage.setItem("currentUser", JSON.stringify(data.user));
+                localStorage.setItem("smartSettleCurrentUser", JSON.stringify(data.user));
+            }
+
+            if (loginMessage) {
+                loginMessage.textContent = "Login successful! Redirecting...";
+                loginMessage.className = "auth-message success";
+            }
+
+            setTimeout(() => {
+                window.location.href = "dashboard.html";
+            }, 800);
+        } catch (err) {
+            if (loginMessage) {
+                loginMessage.textContent = err.message;
+                loginMessage.className = "auth-message error";
+            }
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Login <i class="fa-solid fa-arrow-right"></i>';
+            }
+        }
+    });
+}
+
+// QUICK DEMO LOGIN (Mayur Mittal)
+if (btnQuickDemoLogin) {
+    btnQuickDemoLogin.addEventListener("click", async () => {
+        const loginIdInput = document.getElementById("loginId");
+        const loginPasswordInput = document.getElementById("loginPassword");
+        if (loginIdInput) loginIdInput.value = "mayur@example.com";
+        if (loginPasswordInput) loginPasswordInput.value = "Password@123";
+
+        const submitBtn = loginForm ? loginForm.querySelector('button[type="submit"]') : null;
+        if (submitBtn) submitBtn.click();
     });
 }
 
@@ -178,6 +205,12 @@ let togglePassword = (inputId, button) => {
 };
 
 let logoutUser = () => {
-    removeCurrentUser();
+    localStorage.removeItem("token");
+    if (typeof removeCurrentUser === "function") {
+        removeCurrentUser();
+    } else {
+        localStorage.removeItem("currentUser");
+        localStorage.removeItem("smartSettleCurrentUser");
+    }
     window.location.href = "login.html";
-};
+};

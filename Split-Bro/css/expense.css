@@ -503,3 +503,149 @@
     color:#38bdf8;
     border-color:#38bdf8;
 }
+
+
+/* --- RECEIPT DROPZONE & OCR EXTRACTION STYLES --- */
+.receipt-upload-field {
+    margin-bottom: 24px;
+}
+.receipt-drop-box {
+    border: 2px dashed rgba(56, 189, 248, 0.4);
+    background: rgba(15, 23, 42, 0.6);
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+.receipt-drop-box:hover, .receipt-drop-box.dragover {
+    border-color: #38bdf8;
+    background: rgba(56, 189, 248, 0.08);
+}
+.drop-icon {
+    font-size: 32px;
+    color: #38bdf8;
+    margin-bottom: 8px;
+}
+.drop-content h4 {
+    margin: 0 0 6px;
+    color: #f8fafc;
+    font-size: 15px;
+}
+.drop-content p {
+    margin: 0 0 14px;
+    color: #94a3b8;
+    font-size: 12px;
+}
+.btn-browse-photo {
+    background: #0284c7;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s;
+}
+.btn-browse-photo:hover {
+    background: #0369a1;
+}
+.receipt-preview-box {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    text-align: left;
+    background: rgba(30, 41, 59, 0.7);
+    padding: 12px;
+    border-radius: 10px;
+}
+.preview-img-wrap {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #090d16;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    flex-shrink: 0;
+}
+.preview-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.preview-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+.preview-meta strong {
+    color: #f8fafc;
+    font-size: 13px;
+    word-break: break-all;
+}
+.preview-meta span {
+    color: #94a3b8;
+    font-size: 11px;
+}
+.ocr-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    font-size: 11px;
+    font-weight: 600;
+    width: fit-content;
+    margin-top: 4px;
+}
+.ocr-badge.scanning {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+    border-color: rgba(245, 158, 11, 0.3);
+}
+.btn-remove-receipt {
+    background: transparent;
+    color: #f87171;
+    border: none;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 4px 0;
+    text-align: left;
+    width: fit-content;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.btn-remove-receipt:hover {
+    color: #ef4444;
+    text-decoration: underline;
+}
+.extracted-alert {
+    margin-top: 10px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid #10b981;
+    color: #a7f3d0;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
