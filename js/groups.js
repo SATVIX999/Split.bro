@@ -1,3 +1,12 @@
+if (typeof getApiUrl !== "function") {
+    function getApiUrl(endpoint) {
+        if (window.location && window.location.port === "3000") {
+            return endpoint;
+        }
+        return "http://localhost:3000" + endpoint;
+    }
+}
+
 document.addEventListener("DOMContentLoaded", function () {
 
     const currentUser = getCurrentUser();
@@ -161,39 +170,59 @@ async function saveGroups() {
     );
 
     try {
+        const token = localStorage.getItem("token") || "";
+        const authHeaders = {
+            "Content-Type": "application/json",
+            ...(token ? { "Authorization": "Bearer " + token } : {})
+        };
+
         const response = await fetch(
-            "http://localhost:3000/api/groups"
+            getApiUrl("/api/groups"),
+            { headers: authHeaders }
         );
 
         if (!response.ok) {
-            throw new Error("Unable to fetch groups from backend");
+            throw new Error("Unable to fetch groups from backend: " + response.status);
         }
 
         const serverGroups = await response.json();
 
         for (const group of groups) {
-            const existingGroup = serverGroups.find(
+            const existingGroup = Array.isArray(serverGroups) && serverGroups.find(
                 item => item.groupId === group.groupId
             );
 
             const result = await fetch(
                 existingGroup
-                    ? `http://localhost:3000/api/groups/${encodeURIComponent(group.groupId)}`
-                    : "http://localhost:3000/api/groups",
+                    ? getApiUrl(`/api/groups/${encodeURIComponent(group.groupId)}`)
+                    : getApiUrl("/api/groups"),
                 {
                     method: existingGroup ? "PUT" : "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+                    headers: authHeaders,
                     body: JSON.stringify(group)
                 }
             );
 
             if (!result.ok) {
-                const error = await result.json();
+                const error = await result.json().catch(() => ({}));
                 throw new Error(error.message || "Group sync failed");
             }
+
+            const responseData = await result.json().catch(() => null);
+            if (responseData && responseData.group) {
+                if (responseData.group.groupId && responseData.group.groupId !== group.groupId) {
+                    group.groupId = responseData.group.groupId;
+                }
+                if (responseData.group.groupCode) {
+                    group.groupCode = responseData.group.groupCode;
+                }
+            }
         }
+
+        localStorage.setItem(
+            "smartSettleGroups",
+            JSON.stringify(groups)
+        );
 
         console.log("Groups synced with backend successfully");
     } catch (error) {
@@ -1273,36 +1302,89 @@ async function saveGroups() {
         renderGroups();
     }
 
-    async function loadGroupsFromBackend() {
-    try {
-        const response = await fetch("http://localhost:3000/api/groups");
+    function getTotalExpenses(group) {
+        return (
+            group.expenses || []
+        ).reduce(
+            (
+                sum,
+                expense
+            ) =>
+                sum +
+                Number(
+                    expense.amount || 0
+                ),
+            0
+        );
+    }
 
-        if (!response.ok) {
-            throw new Error("Failed to load groups");
+    async function loadGroupsFromBackend() {
+        const token = localStorage.getItem("token") || "";
+        try {
+            const apiUrl = typeof getApiUrl === "function" ? getApiUrl("/api/groups") : "/api/groups";
+            const response = await fetch(apiUrl, {
+                headers: token ? { "Authorization": "Bearer " + token } : {}
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to load groups: " + response.status);
+            }
+
+            const serverGroups = await response.json();
+            if (Array.isArray(serverGroups)) {
+                groups = serverGroups;
+                localStorage.setItem(
+                    "smartSettleGroups",
+                    JSON.stringify(serverGroups)
+                );
+                renderGroups();
+            }
+        } catch (error) {
+            console.warn("Could not load groups from backend:", error);
+            groups = JSON.parse(
+                localStorage.getItem("smartSettleGroups") || "[]"
+            );
+            renderGroups();
+        }
+    }
+
+    function renderGroups() {
+        if (!groupsContainer) {
+            return;
         }
 
-        const serverGroups = await response.json();
+        groupsContainer.innerHTML =
+            "";
 
-        groups = serverGroups;
+        const visibleGroups =
+            getVisibleGroups();
 
-        localStorage.setItem(
-            "smartSettleGroups",
-            JSON.stringify(serverGroups)
-        );
+        if (
+            visibleGroups.length === 0
+        ) {
+            groupsContainer.style.display =
+                "none";
 
-        renderGroups();
+            if (emptyGroups) {
+                emptyGroups.style.display =
+                    "flex";
+            }
 
-        console.log("Groups loaded successfully:", serverGroups);
-    } catch (error) {
-        console.error("Could not load groups:", error);
+            return;
+        }
 
-        groups = JSON.parse(
-            localStorage.getItem("smartSettleGroups") || "[]"
-        );
+        groupsContainer.style.display =
+            "grid";
 
-        renderGroups();
-    }
-}
+        if (emptyGroups) {
+            emptyGroups.style.display =
+                "none";
+        }
+
+        visibleGroups.forEach(
+            group => {
+                const total =
+                    getTotalExpenses(group);
 
                 const isCreator =
                     String(

@@ -20,6 +20,17 @@ function validateConfig(targetEnv = env, envVars = process.env) {
 
 validateConfig();
 
+const defaultCorsOrigins = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://localhost:5500',
+    'http://127.0.0.1:5500',
+    'http://localhost:5501',
+    'http://127.0.0.1:5501',
+    'http://localhost:5173',
+    'http://127.0.0.1:5173'
+];
+
 const config = {
     env,
     port: parseInt(process.env.PORT || '3000', 10),
@@ -30,8 +41,8 @@ const config = {
     receiptsDir: path.resolve(__dirname, '../../uploads/receipts'),
     maxFileSize: parseInt(process.env.MAX_FILE_SIZE || `${5 * 1024 * 1024}`, 10), // 5MB
     corsOrigins: process.env.CORS_ORIGIN 
-        ? process.env.CORS_ORIGIN.split(',').map(s => s.trim())
-        : ['http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:3000', 'http://127.0.0.1:3000'],
+        ? Array.from(new Set([...process.env.CORS_ORIGIN.split(',').map(s => s.trim()), ...defaultCorsOrigins]))
+        : defaultCorsOrigins,
     validateConfig
 };
 

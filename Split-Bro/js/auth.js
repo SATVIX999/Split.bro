@@ -71,7 +71,6 @@ if (signupForm) {
             submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating Account...';
         }
 
-        let registered = false;
         try {
             const res = await fetch(getApiUrl("/api/auth/register"), {
                 method: "POST",
@@ -92,35 +91,30 @@ if (signupForm) {
                 localStorage.setItem("token", data.token);
                 localStorage.setItem("currentUser", JSON.stringify(data.user));
                 localStorage.setItem("smartSettleCurrentUser", JSON.stringify(data.user));
-                registered = true;
-            } else if (data && data.message) {
-                throw new Error(data.message);
+
+                if (signupMessage) {
+                    signupMessage.textContent = "Account created successfully! Redirecting...";
+                    signupMessage.className = "auth-message success";
+                }
+
+                setTimeout(() => {
+                    window.location.href = "dashboard.html";
+                }, 800);
+            } else {
+                const errorMsg = (data && data.message) ? data.message : "Registration failed. Please check your details.";
+                throw new Error(errorMsg);
             }
         } catch (err) {
-            console.warn("Backend register error, attempting local registration:", err.message);
+            console.warn("Backend register error:", err.message);
+            if (signupMessage) {
+                signupMessage.textContent = err.message || "Registration failed. Please try again.";
+                signupMessage.className = "auth-message error";
+            }
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Create Account <i class="fa-solid fa-arrow-right"></i>';
+            }
         }
-
-        if (!registered) {
-            // Local fallback registration
-            const fallbackUser = {
-                userId: userIdInput || generateUserId(name),
-                name,
-                email
-            };
-            const mockToken = "splitbro_jwt_" + Date.now();
-            localStorage.setItem("token", mockToken);
-            localStorage.setItem("currentUser", JSON.stringify(fallbackUser));
-            localStorage.setItem("smartSettleCurrentUser", JSON.stringify(fallbackUser));
-        }
-
-        if (signupMessage) {
-            signupMessage.textContent = "Account created successfully! Redirecting...";
-            signupMessage.className = "auth-message success";
-        }
-
-        setTimeout(() => {
-            window.location.href = "dashboard.html";
-        }, 800);
     });
 }
 
@@ -144,7 +138,6 @@ if (loginForm) {
             submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Authenticating...';
         }
 
-        let loggedIn = false;
         try {
             const res = await fetch(getApiUrl("/api/auth/login"), {
                 method: "POST",
@@ -163,60 +156,30 @@ if (loginForm) {
                 localStorage.setItem("token", data.token);
                 localStorage.setItem("currentUser", JSON.stringify(data.user));
                 localStorage.setItem("smartSettleCurrentUser", JSON.stringify(data.user));
-                loggedIn = true;
-            } else if (data && data.message) {
-                // If wrong password explicitly returned from backend
-                throw new Error(data.message);
+
+                if (loginMessage) {
+                    loginMessage.textContent = "Login successful! Redirecting...";
+                    loginMessage.className = "auth-message success";
+                }
+
+                setTimeout(() => {
+                    window.location.href = "dashboard.html";
+                }, 800);
+            } else {
+                const errorMsg = (data && data.message) ? data.message : "Incorrect email/User ID or password.";
+                throw new Error(errorMsg);
             }
         } catch (err) {
             console.warn("Backend auth fetch issue:", err.message);
-            if (err.message && err.message.toLowerCase().includes("incorrect")) {
-                if (loginMessage) {
-                    loginMessage.textContent = err.message;
-                    loginMessage.className = "auth-message error";
-                }
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = 'Login <i class="fa-solid fa-arrow-right"></i>';
-                }
-                return;
+            if (loginMessage) {
+                loginMessage.textContent = err.message || "Invalid credentials. Please try again.";
+                loginMessage.className = "auth-message error";
+            }
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Login <i class="fa-solid fa-arrow-right"></i>';
             }
         }
-
-        // If backend fetch was blocked or not reached, use robust local fallback
-        if (!loggedIn) {
-            let uName = "Mayur Mittal";
-            let uId = "MAYUR01";
-            let uEmail = "mayur@example.com";
-
-            if (loginId.includes("@")) {
-                uEmail = loginId;
-                uName = loginId.split("@")[0].toUpperCase();
-                uId = uName.slice(0, 6) + "01";
-            } else if (loginId) {
-                uId = loginId.toUpperCase();
-                uName = uId;
-            }
-
-            const fallbackUser = {
-                userId: uId,
-                name: uName,
-                email: uEmail
-            };
-            const mockToken = "splitbro_jwt_" + Date.now();
-            localStorage.setItem("token", mockToken);
-            localStorage.setItem("currentUser", JSON.stringify(fallbackUser));
-            localStorage.setItem("smartSettleCurrentUser", JSON.stringify(fallbackUser));
-        }
-
-        if (loginMessage) {
-            loginMessage.textContent = "Login successful! Redirecting...";
-            loginMessage.className = "auth-message success";
-        }
-
-        setTimeout(() => {
-            window.location.href = "dashboard.html";
-        }, 800);
     });
 }
 

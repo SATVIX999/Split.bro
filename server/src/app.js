@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 const v8 = require('v8');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
@@ -44,18 +45,25 @@ if (process.env.NODE_ENV !== 'test') {
 // Private receipt uploads are NOT served statically.
 // Receipts are accessed strictly via protected endpoint: GET /api/expenses/receipts/:filename
 const legacyRootPath = path.resolve(__dirname, '../../');
-app.use('/css', express.static(path.join(legacyRootPath, 'css')));
-app.use('/js', express.static(path.join(legacyRootPath, 'js')));
-app.use('/assets', express.static(path.join(legacyRootPath, 'assets')));
+const splitBroPath = path.join(legacyRootPath, 'Split-Bro');
+const staticBaseDir = fs.existsSync(splitBroPath) ? splitBroPath : legacyRootPath;
+
+app.use('/css', express.static(path.join(staticBaseDir, 'css')));
+app.use('/js', express.static(path.join(staticBaseDir, 'js')));
+app.use('/assets', express.static(path.join(staticBaseDir, 'assets')));
+app.use(express.static(staticBaseDir));
 
 const ALLOWED_STATIC_PAGES = new Set([
     'index.html', 'login.html', 'signup.html', 'dashboard.html',
     'groups.html', 'addExpense.html', 'settlement.html', 'history.html',
-    'insights.html', 'profile.html', 'about.html', 'contact.html', 'faq.html'
+    'insights.html', 'profile.html', 'about.html', 'contact.html', 'faq.html', 'test-api.html'
 ]);
 app.get('/:page', (req, res, next) => {
     if (ALLOWED_STATIC_PAGES.has(req.params.page)) {
-        return res.sendFile(path.join(legacyRootPath, req.params.page));
+        const filePath = fs.existsSync(path.join(staticBaseDir, req.params.page))
+            ? path.join(staticBaseDir, req.params.page)
+            : path.join(legacyRootPath, req.params.page);
+        return res.sendFile(filePath);
     }
     return next();
 });
