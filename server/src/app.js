@@ -20,6 +20,7 @@ const AppError = require('./utils/AppError');
 
 const app = express();
 
+// 1. Strict CORS configuration
 app.use(cors({
     origin: (origin, callback) => {
         // Allow requests with no origin (like mobile apps, curl, Postman)
@@ -34,6 +35,7 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
+// 2. Body & cookie parsing
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
@@ -42,7 +44,16 @@ if (process.env.NODE_ENV !== 'test') {
     app.use(morgan('dev'));
 }
 
-// Private receipt uploads are NOT served statically.
+// 3. Sensitive file blocker: Strictly reject requests to internal databases, config, logs, and backend source files
+const SENSITIVE_FILE_PATTERN = /^\/(?:db\.json|\.env|\.git|server(\/|$)|package.*\.json|.*\.log|.*\.bak)/i;
+app.use((req, res, next) => {
+    if (SENSITIVE_FILE_PATTERN.test(req.path)) {
+        return next(new AppError(`Endpoint not found on this server: ${req.method} ${req.originalUrl}`, 404));
+    }
+    next();
+});
+
+// 4. Scoped static asset directories (strictly limited to /css, /js, and /assets)
 // Receipts are accessed strictly via protected endpoint: GET /api/expenses/receipts/:filename
 const legacyRootPath = path.resolve(__dirname, '../../');
 const splitBroPath = path.join(legacyRootPath, 'Split-Bro');
@@ -51,8 +62,8 @@ const staticBaseDir = fs.existsSync(splitBroPath) ? splitBroPath : legacyRootPat
 app.use('/css', express.static(path.join(staticBaseDir, 'css')));
 app.use('/js', express.static(path.join(staticBaseDir, 'js')));
 app.use('/assets', express.static(path.join(staticBaseDir, 'assets')));
-app.use(express.static(staticBaseDir));
 
+// 5. Whitelisted HTML pages only (never serve raw directories or non-whitelisted root files)
 const ALLOWED_STATIC_PAGES = new Set([
     'index.html', 'login.html', 'signup.html', 'dashboard.html',
     'groups.html', 'addExpense.html', 'settlement.html', 'history.html',
@@ -68,6 +79,7 @@ app.get('/:page', (req, res, next) => {
     return next();
 });
 
+// 6. Diagnostics & Service Information
 app.get('/api/health', (req, res) => {
     const heapStats = v8.getHeapStatistics();
     res.status(200).json({
@@ -96,6 +108,7 @@ app.get('/', (req, res) => {
     });
 });
 
+// 7. Mount REST API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/groups', groupRoutes);
 app.use('/api/expenses', expenseRoutes);
@@ -103,6 +116,7 @@ app.use('/api/settlements', settlementRoutes);
 app.use('/api/insights', insightRoutes);
 app.use('/api/users', userRoutes);
 
+// 8. 404 & Centralized Error Handlers
 app.use(notFoundHandler);
 app.use(errorHandler);
 

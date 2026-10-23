@@ -39,11 +39,15 @@ const disconnectDB = async () => {
 
 mongoose.connection.on('disconnected', () => {
     isConnected = false;
-    console.warn('[MongoDB] Connection lost.');
+    if (process.env.NODE_ENV !== 'test') {
+        console.warn('[MongoDB] Connection lost.');
+    }
 });
 
 mongoose.connection.on('error', (err) => {
-    console.error('[MongoDB Runtime Error]:', err.message);
+    if (process.env.NODE_ENV !== 'test') {
+        console.error('[MongoDB Runtime Error]:', err.message);
+    }
 });
 
 module.exports = {

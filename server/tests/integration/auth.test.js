@@ -162,11 +162,23 @@ describe('Integration Tests: Authentication & Security APIs', () => {
         const dbJsonRes = await request(app).get('/db.json');
         expect(dbJsonRes.status).toBe(404);
 
+        const envRes = await request(app).get('/.env');
+        expect(envRes.status).toBe(404);
+
         const serverSrcRes = await request(app).get('/server/src/app.js');
         expect(serverSrcRes.status).toBe(404);
 
+        const serverEntryRes = await request(app).get('/server/src/server.js');
+        expect(serverEntryRes.status).toBe(404);
+
+        const packageJsonRes = await request(app).get('/package.json');
+        expect(packageJsonRes.status).toBe(404);
+
         const loginHtmlRes = await request(app).get('/login.html');
         expect(loginHtmlRes.status).toBe(200);
+
+        const dashboardHtmlRes = await request(app).get('/dashboard.html');
+        expect(dashboardHtmlRes.status).toBe(200);
     });
 
     test('GET /api/users/search and /api/users/:userId should require authentication and escape regex safely', async () => {

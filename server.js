@@ -43,8 +43,17 @@ if (process.env.NODE_ENV !== 'test') {
     app.use(morgan('dev'));
 }
 
-// Private uploads (/server/uploads/receipts) and /db.json are never exposed publicly.
-app.use('/css', express.static(path.join(__dirname, 'Split-Bro', 'css'))); app.use(express.static(path.join(__dirname, 'Split-Bro')));
+// Sensitive file blocker: Strictly reject requests to internal databases, config, logs, and backend source files
+const SENSITIVE_FILE_PATTERN = /^\/(?:db\.json|\.env|\.git|server(\/|$)|package.*\.json|.*\.log|.*\.bak)/i;
+app.use((req, res, next) => {
+    if (SENSITIVE_FILE_PATTERN.test(req.path)) {
+        return next(new AppError(`Endpoint not found on this server: ${req.method} ${req.originalUrl}`, 404));
+    }
+    next();
+});
+
+// Scoped static asset directories (strictly limited to /css, /js, and /assets)
+app.use('/css', express.static(path.join(__dirname, 'Split-Bro', 'css')));
 app.use('/js', express.static(path.join(__dirname, 'Split-Bro', 'js')));
 app.use('/assets', express.static(path.join(__dirname, 'Split-Bro', 'assets')));
 
@@ -56,7 +65,8 @@ const ALLOWED_STATIC_PAGES = new Set([
 
 app.get('/:page', (req, res, next) => {
     if (ALLOWED_STATIC_PAGES.has(req.params.page)) {
-        if (req.params.page === 'test-api.html') return res.sendFile(path.join(__dirname, 'test-api.html')); return res.sendFile(path.join(__dirname, 'Split-Bro', req.params.page));
+        if (req.params.page === 'test-api.html') return res.sendFile(path.join(__dirname, 'test-api.html'));
+        return res.sendFile(path.join(__dirname, 'Split-Bro', req.params.page));
     }
     return next();
 });
@@ -152,4 +162,3 @@ if (require.main === module) {
 module.exports = app;
 module.exports.app = app;
 module.exports.startServer = startServer;
-
