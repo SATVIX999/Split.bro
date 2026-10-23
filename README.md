@@ -187,14 +187,14 @@ npm install
 ```
 
 ### 3. Environment Configuration
-Create a `.env` file in the root folder (or use provided defaults):
+Create a `.env` file in the root folder (or use `.env.example` as a template):
 ```env
 PORT=3000
 NODE_ENV=development
-MONGO_URI=mongodb+srv://mayur3231beai24_db_user:28-July-2006@cluster0.sm6jojd.mongodb.net/splitbro?retryWrites=true&w=majority&appName=Cluster0
-JWT_SECRET=splitbro_super_secure_jwt_secret_dev_key_2026
+MONGO_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/splitbro?retryWrites=true&w=majority
+JWT_SECRET=your_secure_jwt_secret_key_here
 JWT_EXPIRES_IN=7d
-CORS_ORIGIN=http://localhost:3000,http://127.0.0.1:3000
+CORS_ORIGIN=http://localhost:3000,http://127.0.0.1:3000,http://localhost:5500,http://127.0.0.1:5500
 ```
 
 ### 4. Run the Project
