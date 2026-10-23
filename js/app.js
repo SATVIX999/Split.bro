@@ -157,11 +157,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     return;
                 }
 
-
-                localStorage.removeItem("currentUser");
-                localStorage.removeItem("smartSettleCurrentUser");
-                localStorage.removeItem("selectedGroupId");
-
+                if (typeof clearAuthState === "function") {
+                    clearAuthState();
+                } else {
+                    localStorage.removeItem("token");
+                    localStorage.removeItem("currentUser");
+                    localStorage.removeItem("smartSettleCurrentUser");
+                    localStorage.removeItem("selectedGroupId");
+                }
 
                 window.location.href =
                     "index.html";
@@ -275,12 +278,24 @@ document.querySelectorAll(".protected-group-link").forEach(function (link) {
     link.addEventListener("click", function (event) {
         event.preventDefault();
 
-        const currentUser = localStorage.getItem("currentUser");
+        const token = typeof getAuthToken === "function" ? getAuthToken() : (localStorage.getItem("token") || "");
+        const currentUser = typeof getCurrentUser === "function" ? getCurrentUser() : null;
 
-        if (currentUser) {
+        if (token && currentUser) {
             window.location.href = "groups.html";
         } else {
-            window.location.href = "login.html";
+            if (typeof clearAuthState === "function") {
+                clearAuthState();
+            } else {
+                localStorage.removeItem("token");
+                localStorage.removeItem("currentUser");
+                localStorage.removeItem("smartSettleCurrentUser");
+                localStorage.removeItem("selectedGroupId");
+            }
+            try {
+                sessionStorage.setItem("redirectAfterLogin", "groups.html");
+            } catch (e) {}
+            window.location.href = "login.html?redirect=groups.html";
         }
     });
 });

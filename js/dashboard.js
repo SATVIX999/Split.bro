@@ -6,10 +6,11 @@ function getApiUrl(endpoint) {
 }
 // Split Bro - Enhanced Dashboard Controller connected to Express & MongoDB Atlas
 document.addEventListener("DOMContentLoaded", async function () {
-    const token = localStorage.getItem("token") || "";
-    let currentUser = typeof getCurrentUser === "function" ? getCurrentUser() : JSON.parse(localStorage.getItem("smartSettleCurrentUser") || localStorage.getItem("currentUser") || "null");
+    const token = typeof getAuthToken === "function" ? getAuthToken() : (localStorage.getItem("token") || "");
+    const currentUser = typeof getCurrentUser === "function" ? getCurrentUser() : null;
 
-    if (!currentUser) {
+    if (!token || !currentUser) {
+        if (typeof clearAuthState === "function") clearAuthState();
         window.location.href = "login.html";
         return;
     }

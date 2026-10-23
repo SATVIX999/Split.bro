@@ -9,10 +9,13 @@ if (typeof getApiUrl !== "function") {
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    const currentUser = getCurrentUser();
+    const token = typeof getAuthToken === "function" ? getAuthToken() : (localStorage.getItem("token") || "");
+    const currentUser = typeof getCurrentUser === "function" ? getCurrentUser() : null;
 
-    if (!currentUser) {
-        window.location.href = "login.html";
+    if (!token || !currentUser) {
+        if (typeof clearAuthState === "function") clearAuthState();
+        try { sessionStorage.setItem("redirectAfterLogin", "groups.html"); } catch (e) {}
+        window.location.href = "login.html?redirect=groups.html";
         return;
     }
 
@@ -164,6 +167,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     
 async function saveGroups() {
+    const token = typeof getAuthToken === "function" ? getAuthToken() : (localStorage.getItem("token") || "");
+    if (!token) {
+        if (typeof clearAuthState === "function") clearAuthState();
+        try { sessionStorage.setItem("redirectAfterLogin", "groups.html"); } catch (e) {}
+        window.location.href = "login.html?redirect=groups.html";
+        return;
+    }
+
     localStorage.setItem(
         "smartSettleGroups",
         JSON.stringify(groups)
@@ -625,6 +636,16 @@ async function saveGroups() {
     function createGroup(event) {
 
         event.preventDefault();
+
+        const token = typeof getAuthToken === "function" ? getAuthToken() : (localStorage.getItem("token") || "");
+        const user = typeof getCurrentUser === "function" ? getCurrentUser() : null;
+        if (!token || !user) {
+            alert("Authentication required. Please log in to create a group.");
+            if (typeof clearAuthState === "function") clearAuthState();
+            try { sessionStorage.setItem("redirectAfterLogin", "groups.html"); } catch (e) {}
+            window.location.href = "login.html?redirect=groups.html";
+            return;
+        }
 
         groupNameError.textContent = "";
         memberError.textContent = "";
@@ -1319,12 +1340,26 @@ async function saveGroups() {
     }
 
     async function loadGroupsFromBackend() {
-        const token = localStorage.getItem("token") || "";
+        const token = typeof getAuthToken === "function" ? getAuthToken() : (localStorage.getItem("token") || "");
+        if (!token) {
+            if (typeof clearAuthState === "function") clearAuthState();
+            try { sessionStorage.setItem("redirectAfterLogin", "groups.html"); } catch (e) {}
+            window.location.href = "login.html?redirect=groups.html";
+            return;
+        }
+
         try {
             const apiUrl = typeof getApiUrl === "function" ? getApiUrl("/api/groups") : "/api/groups";
             const response = await fetch(apiUrl, {
-                headers: token ? { "Authorization": "Bearer " + token } : {}
+                headers: { "Authorization": "Bearer " + token }
             });
+
+            if (response.status === 401 || response.status === 403) {
+                if (typeof clearAuthState === "function") clearAuthState();
+                try { sessionStorage.setItem("redirectAfterLogin", "groups.html"); } catch (e) {}
+                window.location.href = "login.html?message=session_expired&redirect=groups.html";
+                return;
+            }
 
             if (!response.ok) {
                 throw new Error("Failed to load groups: " + response.status);
@@ -1341,10 +1376,16 @@ async function saveGroups() {
             }
         } catch (error) {
             console.warn("Could not load groups from backend:", error);
-            groups = JSON.parse(
-                localStorage.getItem("smartSettleGroups") || "[]"
-            );
-            renderGroups();
+            const activeToken = typeof getAuthToken === "function" ? getAuthToken() : localStorage.getItem("token");
+            if (activeToken) {
+                groups = JSON.parse(
+                    localStorage.getItem("smartSettleGroups") || "[]"
+                );
+                renderGroups();
+            } else {
+                if (typeof clearAuthState === "function") clearAuthState();
+                window.location.href = "login.html?redirect=groups.html";
+            }
         }
     }
 

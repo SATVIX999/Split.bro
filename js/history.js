@@ -1,6 +1,8 @@
-let currentUser = getCurrentUser();
+let token = typeof getAuthToken === "function" ? getAuthToken() : (localStorage.getItem("token") || "");
+let currentUser = typeof getCurrentUser === "function" ? getCurrentUser() : null;
 
-if (!currentUser) {
+if (!token || !currentUser) {
+    if (typeof clearAuthState === "function") clearAuthState();
     window.location.href = "login.html";
 }
 

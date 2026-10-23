@@ -5,10 +5,11 @@ function getApiUrl(endpoint) {
     return "http://localhost:3000" + endpoint;
 }
 // Split Bro - Add Expense Controller with Multer Upload & Smart Receipt Extraction
-let token = localStorage.getItem("token") || "";
-let currentUser = typeof getCurrentUser === "function" ? getCurrentUser() : JSON.parse(localStorage.getItem("smartSettleCurrentUser") || localStorage.getItem("currentUser") || "null");
+let token = typeof getAuthToken === "function" ? getAuthToken() : (localStorage.getItem("token") || "");
+let currentUser = typeof getCurrentUser === "function" ? getCurrentUser() : null;
 
-if (!currentUser) {
+if (!token || !currentUser) {
+    if (typeof clearAuthState === "function") clearAuthState();
     window.location.href = "login.html";
 }
 

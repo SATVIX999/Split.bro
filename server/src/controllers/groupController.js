@@ -84,8 +84,13 @@ const getGroupById = async (req, res, next) => {
 const createGroup = async (req, res, next) => {
     try {
         const { groupName, category, description, members = [] } = req.body;
-        const currentUserId = req.user ? req.user.userId : req.body.createdBy;
-        const currentUserName = req.user ? req.user.name : (req.body.createdByName || currentUserId);
+
+        if (!req.user || !req.user.userId) {
+            return next(new AppError('Authentication required to create a group', 401));
+        }
+
+        const currentUserId = req.user.userId;
+        const currentUserName = req.user.name || currentUserId;
 
         if (!groupName || !groupName.trim()) {
             return next(new AppError('Group name is required', 400));
@@ -271,8 +276,12 @@ const joinGroupByCode = async (req, res, next) => {
             return next(new AppError('No group found with this group code. Please check and try again.', 404));
         }
 
-        const currentUserId = req.user ? req.user.userId : req.body.userId;
-        const currentUserName = req.user ? req.user.name : (req.body.name || currentUserId);
+        if (!req.user || !req.user.userId) {
+            return next(new AppError('Authentication required to join a group', 401));
+        }
+
+        const currentUserId = req.user.userId;
+        const currentUserName = req.user.name || currentUserId;
 
         if (!currentUserId) {
             return next(new AppError('User authentication required to join a group', 401));

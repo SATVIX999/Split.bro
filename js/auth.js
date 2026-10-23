@@ -97,8 +97,15 @@ if (signupForm) {
                     signupMessage.className = "auth-message success";
                 }
 
+                let redirectTarget = "dashboard.html";
+                try {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    redirectTarget = sessionStorage.getItem("redirectAfterLogin") || urlParams.get("redirect") || "dashboard.html";
+                    sessionStorage.removeItem("redirectAfterLogin");
+                } catch (e) {}
+
                 setTimeout(() => {
-                    window.location.href = "dashboard.html";
+                    window.location.href = redirectTarget;
                 }, 800);
             } else {
                 const errorMsg = (data && data.message) ? data.message : "Registration failed. Please check your details.";
@@ -162,8 +169,15 @@ if (loginForm) {
                     loginMessage.className = "auth-message success";
                 }
 
+                let redirectTarget = "dashboard.html";
+                try {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    redirectTarget = sessionStorage.getItem("redirectAfterLogin") || urlParams.get("redirect") || "dashboard.html";
+                    sessionStorage.removeItem("redirectAfterLogin");
+                } catch (e) {}
+
                 setTimeout(() => {
-                    window.location.href = "dashboard.html";
+                    window.location.href = redirectTarget;
                 }, 800);
             } else {
                 const errorMsg = (data && data.message) ? data.message : "Incorrect email/User ID or password.";
@@ -212,12 +226,36 @@ let togglePassword = (inputId, button) => {
 };
 
 let logoutUser = () => {
-    localStorage.removeItem("token");
-    if (typeof removeCurrentUser === "function") {
-        removeCurrentUser();
+    if (typeof clearAuthState === "function") {
+        clearAuthState();
     } else {
+        localStorage.removeItem("token");
         localStorage.removeItem("currentUser");
         localStorage.removeItem("smartSettleCurrentUser");
+        localStorage.removeItem("selectedGroupId");
+        try {
+            sessionStorage.removeItem("smartSettleExpenseDraft");
+            sessionStorage.removeItem("redirectAfterLogin");
+        } catch (e) {}
     }
     window.location.href = "login.html";
 };
+
+// Handle contextual login messages (e.g., session expired, required login for groups)
+document.addEventListener("DOMContentLoaded", () => {
+    const loginMessageEl = document.getElementById("loginMessage");
+    if (loginMessageEl) {
+        try {
+            const urlParams = new URLSearchParams(window.location.search);
+            const msg = urlParams.get("message");
+            const redirect = urlParams.get("redirect");
+            if (msg === "session_expired") {
+                loginMessageEl.textContent = "Please log in to continue.";
+                loginMessageEl.className = "auth-message error";
+            } else if (redirect === "groups.html" || redirect === "addExpense.html" || redirect === "settlement.html") {
+                loginMessageEl.textContent = "Please log in to access this feature.";
+                loginMessageEl.className = "auth-message error";
+            }
+        } catch (e) {}
+    }
+});
