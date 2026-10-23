@@ -11,6 +11,7 @@
 </p>
 
 <p align="center">
+  <a href="#live-deployment">Live Deployment</a> &bull;
   <a href="#-features">Features</a> &bull;
   <a href="#-system-architecture">Architecture</a> &bull;
   <a href="#-workflow-diagrams">Workflows</a> &bull;
@@ -20,6 +21,15 @@
   <a href="#-screenshots">Screenshots</a> &bull;
   <a href="#-team-members">Team</a>
 </p>
+
+---
+
+## Live Deployment
+
+- **API Base URL:** https://split-bro-api.onrender.com
+- **Health Check:** https://split-bro-api.onrender.com/api/health
+
+The backend is deployed on Render and connects to MongoDB. API endpoints can be tested using Postman or Thunder Client.
 
 ---
 

@@ -1,5 +1,8 @@
 const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '../../../.env'), quiet: true });
+const dotenv = require('dotenv');
+dotenv.config({ path: path.resolve(__dirname, '../../../.env'), quiet: true });
+dotenv.config({ path: path.resolve(__dirname, '../../.env'), quiet: true });
+dotenv.config({ path: path.resolve(__dirname, '../.env'), quiet: true });
 
 const env = process.env.NODE_ENV || 'development';
 

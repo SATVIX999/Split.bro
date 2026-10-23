@@ -1,3 +1,11 @@
+
+function resolveFrontendPath(relativePath) {
+    const p1 = path.join(__dirname, '../../../frontend', relativePath);
+    if (fs.existsSync(p1)) return p1;
+    const p2 = path.join(__dirname, '../../../', relativePath);
+    if (fs.existsSync(p2)) return p2;
+    return p1;
+}
 const fs = require('fs');
 const path = require('path');
 const jwt = require('jsonwebtoken');
@@ -31,8 +39,8 @@ describe('Security & Regression Tests: Group Authentication Guard & Bypass Preve
 
     // 1. A logged-out user clicking Create Group is redirected to the login page.
     test('1. Frontend guard contract: index.html Create Group links require authentication and point to login when logged out', () => {
-        const indexHtml = fs.readFileSync(path.join(__dirname, '../../../index.html'), 'utf-8');
-        const appJs = fs.readFileSync(path.join(__dirname, '../../../js/app.js'), 'utf-8');
+        const indexHtml = fs.readFileSync(resolveFrontendPath('index.html'), 'utf-8');
+        const appJs = fs.readFileSync(resolveFrontendPath('js/app.js'), 'utf-8');
 
         // All group navigation links must carry the protected class
         const groupLinkRegex = /<a[^>]*href=["']groups\.html["'][^>]*>/gi;
@@ -63,7 +71,7 @@ describe('Security & Regression Tests: Group Authentication Guard & Bypass Preve
 
     // 3. Opening the Groups page directly while logged out redirects to login.
     test('3. Groups page frontend script enforces redirect to login.html when token/currentUser is absent', () => {
-        const groupsJs = fs.readFileSync(path.join(__dirname, '../../../js/groups.js'), 'utf-8');
+        const groupsJs = fs.readFileSync(resolveFrontendPath('js/groups.js'), 'utf-8');
 
         expect(groupsJs).toMatch(/if\s*\(!token\s*\|\|\s*!currentUser\)/);
         expect(groupsJs).toMatch(/window\.location\.href\s*=\s*["']login\.html\?redirect=groups\.html["']/);
@@ -113,7 +121,7 @@ describe('Security & Regression Tests: Group Authentication Guard & Bypass Preve
         expect(res.body.token).toBeUndefined();
         expect(res.body.user).toBeUndefined();
 
-        const authJs = fs.readFileSync(path.join(__dirname, '../../../js/auth.js'), 'utf-8');
+        const authJs = fs.readFileSync(resolveFrontendPath('js/auth.js'), 'utf-8');
         expect(authJs).not.toMatch(/splitbro_jwt_/);
         expect(authJs).not.toMatch(/fallbackUser.*MAYUR01/i);
     });
@@ -138,7 +146,7 @@ describe('Security & Regression Tests: Group Authentication Guard & Bypass Preve
 
     // 7. The explicit Quick Demo Login button works only when the user intentionally clicks it.
     test('7. Quick Demo Login button is strictly tied to explicit click event listener', () => {
-        const authJs = fs.readFileSync(path.join(__dirname, '../../../js/auth.js'), 'utf-8');
+        const authJs = fs.readFileSync(resolveFrontendPath('js/auth.js'), 'utf-8');
 
         // Must attach to click event on btnQuickDemoLogin
         expect(authJs).toMatch(/btnQuickDemoLogin\.addEventListener\(["']click["']/);
@@ -168,7 +176,7 @@ describe('Security & Regression Tests: Group Authentication Guard & Bypass Preve
 
     // 9. Logout clears the relevant authentication state, and protected actions remain blocked afterward.
     test('9. Storage module clearAuthState purges token, currentUser, and smartSettleCurrentUser', () => {
-        const storageModule = require('../../../js/storage');
+        const storageModule = require(resolveFrontendPath('js/storage'));
 
         // Mock localStorage and sessionStorage
         const mockLocalStorage = {};
@@ -205,7 +213,7 @@ describe('Security & Regression Tests: Group Authentication Guard & Bypass Preve
 
     // 10. Refreshing or navigating between pages does not automatically restore a fake logged-in session.
     test('10. Unauthenticated state with residual local user without token is rejected as unauthenticated', () => {
-        const storageModule = require('../../../js/storage');
+        const storageModule = require(resolveFrontendPath('js/storage'));
 
         // Simulate a scenario where a user object exists in localStorage but no token exists
         const mockStorage = {

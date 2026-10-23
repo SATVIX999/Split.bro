@@ -158,7 +158,7 @@ describe('Integration Tests: Authentication & Security APIs', () => {
         expect(blockedRes.body.message).toMatch(/Not allowed by CORS/i);
     });
 
-    test('Scoped static file serving should block sensitive server files while serving whitelisted HTML', async () => {
+    test('API-only deployment should block sensitive files and not serve frontend HTML pages', async () => {
         const dbJsonRes = await request(app).get('/db.json');
         expect(dbJsonRes.status).toBe(404);
 
@@ -175,10 +175,10 @@ describe('Integration Tests: Authentication & Security APIs', () => {
         expect(packageJsonRes.status).toBe(404);
 
         const loginHtmlRes = await request(app).get('/login.html');
-        expect(loginHtmlRes.status).toBe(200);
+        expect(loginHtmlRes.status).toBe(404);
 
         const dashboardHtmlRes = await request(app).get('/dashboard.html');
-        expect(dashboardHtmlRes.status).toBe(200);
+        expect(dashboardHtmlRes.status).toBe(404);
     });
 
     test('GET /api/users/search and /api/users/:userId should require authentication and escape regex safely', async () => {
