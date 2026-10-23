@@ -55,13 +55,29 @@ app.use((req, res, next) => {
 
 // 4. Scoped static asset directories (strictly limited to /css, /js, and /assets)
 // Receipts are accessed strictly via protected endpoint: GET /api/expenses/receipts/:filename
-const legacyRootPath = path.resolve(__dirname, '../../');
-const splitBroPath = path.join(legacyRootPath, 'Split-Bro');
-const staticBaseDir = fs.existsSync(splitBroPath) ? splitBroPath : legacyRootPath;
+const rootDir = path.resolve(__dirname, '../../');
+const splitBroDir = path.join(rootDir, 'Split-Bro');
 
-app.use('/css', express.static(path.join(staticBaseDir, 'css')));
-app.use('/js', express.static(path.join(staticBaseDir, 'js')));
-app.use('/assets', express.static(path.join(staticBaseDir, 'assets')));
+if (fs.existsSync(path.join(rootDir, 'css'))) {
+    app.use('/css', express.static(path.join(rootDir, 'css')));
+}
+if (fs.existsSync(path.join(splitBroDir, 'css'))) {
+    app.use('/css', express.static(path.join(splitBroDir, 'css')));
+}
+
+if (fs.existsSync(path.join(rootDir, 'js'))) {
+    app.use('/js', express.static(path.join(rootDir, 'js')));
+}
+if (fs.existsSync(path.join(splitBroDir, 'js'))) {
+    app.use('/js', express.static(path.join(splitBroDir, 'js')));
+}
+
+if (fs.existsSync(path.join(rootDir, 'assets'))) {
+    app.use('/assets', express.static(path.join(rootDir, 'assets')));
+}
+if (fs.existsSync(path.join(splitBroDir, 'assets'))) {
+    app.use('/assets', express.static(path.join(splitBroDir, 'assets')));
+}
 
 // 5. Whitelisted HTML pages only (never serve raw directories or non-whitelisted root files)
 const ALLOWED_STATIC_PAGES = new Set([
@@ -71,10 +87,14 @@ const ALLOWED_STATIC_PAGES = new Set([
 ]);
 app.get('/:page', (req, res, next) => {
     if (ALLOWED_STATIC_PAGES.has(req.params.page)) {
-        const filePath = fs.existsSync(path.join(staticBaseDir, req.params.page))
-            ? path.join(staticBaseDir, req.params.page)
-            : path.join(legacyRootPath, req.params.page);
-        return res.sendFile(filePath);
+        const rootPagePath = path.join(rootDir, req.params.page);
+        if (fs.existsSync(rootPagePath)) {
+            return res.sendFile(rootPagePath);
+        }
+        const subfolderPagePath = path.join(splitBroDir, req.params.page);
+        if (fs.existsSync(subfolderPagePath)) {
+            return res.sendFile(subfolderPagePath);
+        }
     }
     return next();
 });
