@@ -125,6 +125,80 @@ if (signupForm) {
     });
 }
 
+// HELPER: EXECUTE LOGIN
+async function executeLogin(identifier, password, triggerBtn) {
+    let loginMessage = document.getElementById("loginMessage");
+    if (loginMessage) {
+        loginMessage.textContent = "";
+        loginMessage.className = "auth-message";
+    }
+
+    const submitBtn = loginForm ? loginForm.querySelector('button[type="submit"]') : null;
+    if (submitBtn) submitBtn.disabled = true;
+    if (btnQuickDemoLogin) btnQuickDemoLogin.disabled = true;
+
+    if (triggerBtn) {
+        triggerBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Authenticating...';
+    }
+
+    try {
+        const res = await fetch(getApiUrl("/api/auth/login"), {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                identifier: identifier,
+                password: password
+            })
+        });
+
+        const text = await res.text();
+        let data = null;
+        try { data = text ? JSON.parse(text) : null; } catch (e) {}
+
+        if (res.ok && data && data.token) {
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("currentUser", JSON.stringify(data.user));
+            localStorage.setItem("smartSettleCurrentUser", JSON.stringify(data.user));
+
+            if (loginMessage) {
+                loginMessage.textContent = "Login successful! Redirecting...";
+                loginMessage.className = "auth-message success";
+            }
+
+            let redirectTarget = "dashboard.html";
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                redirectTarget = sessionStorage.getItem("redirectAfterLogin") || urlParams.get("redirect") || "dashboard.html";
+                sessionStorage.removeItem("redirectAfterLogin");
+            } catch (e) {}
+
+            setTimeout(() => {
+                window.location.href = redirectTarget;
+            }, 800);
+        } else {
+            const errorMsg = (data && data.message) ? data.message : "Incorrect email/User ID or password.";
+            throw new Error(errorMsg);
+        }
+    } catch (err) {
+        console.warn("Backend auth fetch issue:", err.message);
+        if (loginMessage) {
+            const isConnectionError = err.message && (err.message.includes("fetch") || err.message.includes("NetworkError") || err.message.includes("Failed to fetch"));
+            loginMessage.textContent = isConnectionError
+                ? "Cannot connect to server. Please ensure the backend is running with 'npm start'."
+                : (err.message || "Invalid credentials. Please try again.");
+            loginMessage.className = "auth-message error";
+        }
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Login <i class="fa-solid fa-arrow-right"></i>';
+        }
+        if (btnQuickDemoLogin) {
+            btnQuickDemoLogin.disabled = false;
+            btnQuickDemoLogin.innerHTML = '<i class="fa-solid fa-bolt"></i> Quick Demo Login (Mayur Mittal)';
+        }
+    }
+}
+
 // LOGIN HANDLER
 if (loginForm) {
     loginForm.addEventListener("submit", async (event) => {
@@ -132,81 +206,25 @@ if (loginForm) {
 
         let loginId = document.getElementById("loginId").value.trim();
         let password = document.getElementById("loginPassword").value;
-        let loginMessage = document.getElementById("loginMessage");
-
-        if (loginMessage) {
-            loginMessage.textContent = "";
-            loginMessage.className = "auth-message";
-        }
-
         const submitBtn = loginForm.querySelector('button[type="submit"]');
-        if (submitBtn) {
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Authenticating...';
-        }
 
-        try {
-            const res = await fetch(getApiUrl("/api/auth/login"), {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    identifier: loginId,
-                    password: password
-                })
-            });
-
-            const text = await res.text();
-            let data = null;
-            try { data = text ? JSON.parse(text) : null; } catch (e) {}
-
-            if (res.ok && data && data.token) {
-                localStorage.setItem("token", data.token);
-                localStorage.setItem("currentUser", JSON.stringify(data.user));
-                localStorage.setItem("smartSettleCurrentUser", JSON.stringify(data.user));
-
-                if (loginMessage) {
-                    loginMessage.textContent = "Login successful! Redirecting...";
-                    loginMessage.className = "auth-message success";
-                }
-
-                let redirectTarget = "dashboard.html";
-                try {
-                    const urlParams = new URLSearchParams(window.location.search);
-                    redirectTarget = sessionStorage.getItem("redirectAfterLogin") || urlParams.get("redirect") || "dashboard.html";
-                    sessionStorage.removeItem("redirectAfterLogin");
-                } catch (e) {}
-
-                setTimeout(() => {
-                    window.location.href = redirectTarget;
-                }, 800);
-            } else {
-                const errorMsg = (data && data.message) ? data.message : "Incorrect email/User ID or password.";
-                throw new Error(errorMsg);
-            }
-        } catch (err) {
-            console.warn("Backend auth fetch issue:", err.message);
-            if (loginMessage) {
-                loginMessage.textContent = err.message || "Invalid credentials. Please try again.";
-                loginMessage.className = "auth-message error";
-            }
-            if (submitBtn) {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = 'Login <i class="fa-solid fa-arrow-right"></i>';
-            }
-        }
+        await executeLogin(loginId, password, submitBtn);
     });
 }
 
 // QUICK DEMO LOGIN (Mayur Mittal)
 if (btnQuickDemoLogin) {
-    btnQuickDemoLogin.addEventListener("click", () => {
+    btnQuickDemoLogin.addEventListener("click", async (event) => {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
         const loginIdInput = document.getElementById("loginId");
         const loginPasswordInput = document.getElementById("loginPassword");
         if (loginIdInput) loginIdInput.value = "mayur@example.com";
         if (loginPasswordInput) loginPasswordInput.value = "Password@123";
 
-        const submitBtn = loginForm ? loginForm.querySelector('button[type="submit"]') : null;
-        if (submitBtn) submitBtn.click();
+        await executeLogin("mayur@example.com", "Password@123", btnQuickDemoLogin);
     });
 }
 
