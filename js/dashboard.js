@@ -1,1105 +1,333 @@
-document.addEventListener("DOMContentLoaded", function () {
-
-    const currentUser =
-        typeof getCurrentUser === "function"
-            ? getCurrentUser()
-            : JSON.parse(
-                localStorage.getItem(
-                    "currentUser"
-                )
-            );
-
+function getApiUrl(endpoint) {
+    if (window.location && window.location.port === "3000") {
+        return endpoint;
+    }
+    return "http://localhost:3000" + endpoint;
+}
+// Split Bro - Enhanced Dashboard Controller connected to Express & MongoDB Atlas
+document.addEventListener("DOMContentLoaded", async function () {
+    const token = localStorage.getItem("token") || "";
+    let currentUser = typeof getCurrentUser === "function" ? getCurrentUser() : JSON.parse(localStorage.getItem("smartSettleCurrentUser") || localStorage.getItem("currentUser") || "null");
 
     if (!currentUser) {
-
-        window.location.href =
-            "login.html";
-
+        window.location.href = "login.html";
         return;
-
     }
 
+    // Set Welcome Name
+    const heroUserName = document.getElementById("heroUserName");
+    if (heroUserName) heroUserName.textContent = currentUser.name || "User";
 
-    const users =
-        typeof getUsers === "function"
-            ? getUsers()
-            : JSON.parse(
-                localStorage.getItem(
-                    "users"
-                )
-            ) || [];
+    let groups = [];
+    let selectedGroup = null;
+    let expenses = [];
+    let settlements = [];
 
+    // Elements
+    const overviewTotal = document.getElementById("overviewTotal");
+    const overviewPaid = document.getElementById("overviewPaid");
+    const overviewBalance = document.getElementById("overviewBalance");
+    const overviewBalanceText = document.getElementById("overviewBalanceText");
 
-    const groups =
-        JSON.parse(
-            localStorage.getItem(
-                "smartSettleGroups"
-            )
-        ) || [];
+    const dashboardGroupName = document.getElementById("dashboardGroupName");
+    const dashboardMembersText = document.getElementById("dashboardMembersText");
+    const dashboardMemberCount = document.getElementById("dashboardMemberCount");
+    const expenseCount = document.getElementById("expenseCount");
+    const totalExpenses = document.getElementById("totalExpenses");
 
+    const dashboardMembers = document.getElementById("dashboardMembers");
+    const recentExpenses = document.getElementById("recentExpenses");
 
-    const selectedGroupId =
-        localStorage.getItem(
-            "selectedGroupId"
-        );
+    // Modal Elements
+    const receiptModal = document.getElementById("receiptModal");
+    const receiptModalImg = document.getElementById("receiptModalImg");
+    const receiptModalTitle = document.getElementById("receiptModalTitle");
+    const receiptModalMeta = document.getElementById("receiptModalMeta");
+    const receiptDownloadLink = document.getElementById("receiptDownloadLink");
+    const closeReceiptModal = document.getElementById("closeReceiptModal");
 
+    const diagnosticsModal = document.getElementById("diagnosticsModal");
+    const closeDiagnosticsModal = document.getElementById("closeDiagnosticsModal");
+    const btnExportCsvCard = document.getElementById("btnExportCsvCard");
+    const btnSystemHealthCard = document.getElementById("btnSystemHealthCard");
 
-    function isGuest(member) {
-
-        return (
-            typeof member === "object" &&
-            member !== null &&
-            member.type === "guest"
-        );
-
+    // Modal close listeners
+    if (closeReceiptModal) {
+        closeReceiptModal.addEventListener("click", () => receiptModal.style.display = "none");
     }
-
-
-    function getMemberId(member) {
-
-        if (isGuest(member)) {
-
-            return member.memberId;
-
-        }
-
-        return String(member);
-
+    if (closeDiagnosticsModal) {
+        closeDiagnosticsModal.addEventListener("click", () => diagnosticsModal.style.display = "none");
     }
+    window.addEventListener("click", (e) => {
+        if (e.target === receiptModal) receiptModal.style.display = "none";
+        if (e.target === diagnosticsModal) diagnosticsModal.style.display = "none";
+    });
 
+    // Global viewer function for inline buttons
+    window.viewReceiptPhoto = function (url, title, originalName) {
+        if (!url) return;
+        const authUrl = token ? `${url}?token=${token}` : url;
+        if (receiptModalImg) receiptModalImg.src = authUrl;
+        if (receiptModalTitle) receiptModalTitle.innerHTML = `<i class="fa-solid fa-receipt"></i> ${title || 'Bill Photo'}`;
+        if (receiptModalMeta) receiptModalMeta.textContent = originalName ? `File: ${originalName} (Multer Upload)` : 'Attached via Multer file upload';
+        if (receiptDownloadLink) receiptDownloadLink.href = authUrl;
+        if (receiptModal) receiptModal.style.display = "flex";
+    };
 
-    function getMemberUserId(member) {
-
-        if (isGuest(member)) {
-
-            return member.userId || null;
-
-        }
-
-        return String(member);
-
-    }
-
-
-    function getMemberName(member) {
-
-        if (isGuest(member)) {
-
-            return member.name ||
-                "Guest Member";
-
-        }
-
-
-        const user =
-            users.find(
-                item =>
-                    String(
-                        item.userId
-                    ).toUpperCase() ===
-                    String(
-                        member
-                    ).toUpperCase()
-            );
-
-
-        return user
-            ? user.name
-            : String(member);
-
-    }
-
-
-    function isCurrentUserMember(group) {
-
-        if (
-            !group ||
-            !Array.isArray(
-                group.members
-            )
-        ) {
-
-            return false;
-
-        }
-
-
-        return group.members.some(
-            member => {
-
-                const userId =
-                    getMemberUserId(
-                        member
-                    );
-
-
-                return (
-                    userId &&
-                    String(
-                        userId
-                    ).toUpperCase() ===
-                    String(
-                        currentUser.userId
-                    ).toUpperCase()
-                );
-
+    // 1. Fetch Groups
+    try {
+        if (token) {
+            const res = await fetch(getApiUrl("/api/groups"), {
+                headers: { "Authorization": "Bearer " + token }
+            });
+            if (res.ok) {
+                groups = await res.json();
+                localStorage.setItem("smartSettleGroups", JSON.stringify(groups));
+            } else {
+                throw new Error("HTTP " + res.status);
             }
-        );
-
-    }
-
-
-    let selectedGroup =
-        groups.find(
-            group =>
-                String(
-                    group.groupId
-                ) ===
-                String(
-                    selectedGroupId
-                ) &&
-                isCurrentUserMember(
-                    group
-                )
-        );
-
-
-    if (!selectedGroup) {
-
-        selectedGroup =
-            groups.find(
-                group =>
-                    isCurrentUserMember(
-                        group
-                    )
-            );
-
-    }
-
-
-    if (selectedGroup) {
-
-        localStorage.setItem(
-            "selectedGroupId",
-            selectedGroup.groupId
-        );
-
-    } else {
-
-        localStorage.removeItem(
-            "selectedGroupId"
-        );
-
-    }
-
-
-    const navUserName =
-        document.getElementById(
-            "navUserName"
-        );
-
-    const navUserAvatar =
-        document.getElementById(
-            "navUserAvatar"
-        );
-
-    const dropdownUserName =
-        document.getElementById(
-            "dropdownUserName"
-        );
-
-    const dropdownUserId =
-        document.getElementById(
-            "dropdownUserId"
-        );
-
-    const heroUserName =
-        document.getElementById(
-            "heroUserName"
-        );
-
-
-    if (navUserName) {
-
-        navUserName.textContent =
-            currentUser.name;
-
-    }
-
-
-    if (navUserAvatar) {
-
-        navUserAvatar.textContent =
-            currentUser.name
-                .charAt(0)
-                .toUpperCase();
-
-    }
-
-
-    if (dropdownUserName) {
-
-        dropdownUserName.textContent =
-            currentUser.name;
-
-    }
-
-
-    if (dropdownUserId) {
-
-        dropdownUserId.textContent =
-            currentUser.userId;
-
-    }
-
-
-    if (heroUserName) {
-
-        heroUserName.textContent =
-            currentUser.name;
-
-    }
-
-
-    const dashboardGroupName =
-        document.getElementById(
-            "dashboardGroupName"
-        );
-
-    const dashboardMembersText =
-        document.getElementById(
-            "dashboardMembersText"
-        );
-
-    const dashboardMemberCount =
-        document.getElementById(
-            "dashboardMemberCount"
-        );
-
-    const totalExpenses =
-        document.getElementById(
-            "totalExpenses"
-        );
-
-    const expenseCount =
-        document.getElementById(
-            "expenseCount"
-        );
-
-    const dashboardMembers =
-        document.getElementById(
-            "dashboardMembers"
-        );
-
-    const recentExpenses =
-        document.getElementById(
-            "recentExpenses"
-        );
-
-    const overviewTotal =
-        document.getElementById(
-            "overviewTotal"
-        );
-
-    const overviewPaid =
-        document.getElementById(
-            "overviewPaid"
-        );
-
-    const overviewBalance =
-        document.getElementById(
-            "overviewBalance"
-        );
-
-    const overviewBalanceText =
-        document.getElementById(
-            "overviewBalanceText"
-        );
-
-
-    function showNoGroup() {
-
-        if (dashboardGroupName) {
-
-            dashboardGroupName.textContent =
-                "No Active Group";
-
-        }
-
-
-        if (dashboardMembersText) {
-
-            dashboardMembersText.textContent =
-                "Create or select a group to get started.";
-
-        }
-
-
-        if (dashboardMemberCount) {
-
-            dashboardMemberCount.textContent =
-                "0";
-
-        }
-
-
-        if (totalExpenses) {
-
-            totalExpenses.textContent =
-                "₹0.00";
-
-        }
-
-
-        if (expenseCount) {
-
-            expenseCount.textContent =
-                "0";
-
-        }
-
-
-        if (overviewTotal) {
-
-            overviewTotal.textContent =
-                "₹0.00";
-
-        }
-
-
-        if (overviewPaid) {
-
-            overviewPaid.textContent =
-                "₹0.00";
-
-        }
-
-
-        if (overviewBalance) {
-
-            overviewBalance.textContent =
-                "₹0.00";
-
-        }
-
-
-        if (overviewBalanceText) {
-
-            overviewBalanceText.textContent =
-                "Create a group to start";
-
-        }
-
-
-        if (dashboardMembers) {
-
-            dashboardMembers.innerHTML = `
-
-                <div class="empty-dashboard">
-
-                    <i class="fa-solid fa-users"></i>
-
-                    <p>
-                        No active group
-                    </p>
-
-                    <a href="groups.html">
-                        Create or select a group
-                    </a>
-
-                </div>
-
-            `;
-
-        }
-
-
-        if (recentExpenses) {
-
-            recentExpenses.innerHTML = `
-
-                <div class="empty-dashboard">
-
-                    <i class="fa-solid fa-receipt"></i>
-
-                    <p>
-                        No expenses yet
-                    </p>
-
-                    <a href="addExpense.html">
-                        Add your first expense
-                    </a>
-
-                </div>
-
-            `;
-
-        }
-
-    }
-
-
-    if (!selectedGroup) {
-
-        showNoGroup();
-
-        return;
-
-    }
-
-
-    const members =
-        Array.isArray(
-            selectedGroup.members
-        )
-            ? selectedGroup.members
-            : [];
-
-
-    const expenses =
-        Array.isArray(
-            selectedGroup.expenses
-        )
-            ? selectedGroup.expenses
-            : [];
-
-
-    if (dashboardGroupName) {
-
-        dashboardGroupName.textContent =
-            selectedGroup.groupName;
-
-    }
-
-
-    if (dashboardMembersText) {
-
-        dashboardMembersText.textContent =
-            `${members.length} ${
-                members.length === 1
-                    ? "member"
-                    : "members"
-            } in this group`;
-
-    }
-
-
-    if (dashboardMemberCount) {
-
-        dashboardMemberCount.textContent =
-            members.length;
-
-    }
-
-
-    const total =
-        expenses.reduce(
-            (
-                sum,
-                expense
-            ) =>
-                sum +
-                Number(
-                    expense.amount ||
-                    0
-                ),
-            0
-        );
-
-
-    if (totalExpenses) {
-
-        totalExpenses.textContent =
-            `₹${total.toFixed(2)}`;
-
-    }
-
-
-    if (expenseCount) {
-
-        expenseCount.textContent =
-            expenses.length;
-
-    }
-
-
-    const myPaid =
-        expenses.reduce(
-            (
-                sum,
-                expense
-            ) => {
-
-                const payer =
-                    String(
-                        expense.payer ||
-                        ""
-                    ).toUpperCase();
-
-
-                const me =
-                    String(
-                        currentUser.userId
-                    ).toUpperCase();
-
-
-                if (
-                    payer === me
-                ) {
-
-                    return (
-                        sum +
-                        Number(
-                            expense.amount ||
-                            0
-                        )
-                    );
-
-                }
-
-
-                return sum;
-
-            },
-            0
-        );
-
-
-    if (overviewTotal) {
-
-        overviewTotal.textContent =
-            `₹${total.toFixed(2)}`;
-
-    }
-
-
-    if (overviewPaid) {
-
-        overviewPaid.textContent =
-            `₹${myPaid.toFixed(2)}`;
-
-    }
-
-
-    const balances = {};
-
-
-    members.forEach(
-        member => {
-
-            balances[
-                getMemberId(
-                    member
-                )
-            ] = 0;
-
-        }
-    );
-
-
-    expenses.forEach(
-        expense => {
-
-            const payer =
-                String(
-                    expense.payer ||
-                    ""
-                ).toUpperCase();
-
-
-            const payerId =
-                Object.keys(
-                    balances
-                ).find(
-                    id =>
-                        String(
-                            id
-                        ).toUpperCase() ===
-                        payer
-                );
-
-
-            if (payerId) {
-
-                balances[payerId] +=
-                    Number(
-                        expense.amount ||
-                        0
-                    );
-
-            }
-
-
-            if (
-                expense.shares
-            ) {
-
-                Object.entries(
-                    expense.shares
-                ).forEach(
-                    (
-                        [
-                            userId,
-                            share
-                        ]
-                    ) => {
-
-                        const memberId =
-                            Object.keys(
-                                balances
-                            ).find(
-                                id =>
-                                    String(
-                                        id
-                                    ).toUpperCase() ===
-                                    String(
-                                        userId
-                                    ).toUpperCase()
-                            );
-
-
-                        if (memberId) {
-
-                            balances[
-                                memberId
-                            ] -=
-                                Number(
-                                    share ||
-                                    0
-                                );
-
-                        }
-
-                    }
-                );
-
-            }
-
-        }
-    );
-
-
-    if (
-        Array.isArray(
-            selectedGroup.settledPayments
-        )
-    ) {
-
-        selectedGroup.settledPayments.forEach(
-            payment => {
-
-                const fromId =
-                    Object.keys(
-                        balances
-                    ).find(
-                        id =>
-                            String(
-                                id
-                            ).toUpperCase() ===
-                            String(
-                                payment.from
-                            ).toUpperCase()
-                    );
-
-
-                const toId =
-                    Object.keys(
-                        balances
-                    ).find(
-                        id =>
-                            String(
-                                id
-                            ).toUpperCase() ===
-                            String(
-                                payment.to
-                            ).toUpperCase()
-                    );
-
-
-                if (fromId) {
-
-                    balances[fromId] +=
-                        Number(
-                            payment.amount ||
-                            0
-                        );
-
-                }
-
-
-                if (toId) {
-
-                    balances[toId] -=
-                        Number(
-                            payment.amount ||
-                            0
-                        );
-
-                }
-
-            }
-        );
-
-    }
-
-
-    Object.keys(
-        balances
-    ).forEach(
-        id => {
-
-            balances[id] =
-                Number(
-                    balances[id]
-                        .toFixed(2)
-                );
-
-        }
-    );
-
-
-    const myUserId =
-        String(
-            currentUser.userId
-        ).toUpperCase();
-
-
-    const myBalanceKey =
-        Object.keys(
-            balances
-        ).find(
-            id =>
-                String(
-                    id
-                ).toUpperCase() ===
-                myUserId
-        );
-
-
-    const myBalance =
-        myBalanceKey
-            ? balances[
-                myBalanceKey
-            ]
-            : 0;
-
-
-    if (overviewBalance) {
-
-        overviewBalance.textContent =
-            `₹${Math.abs(
-                myBalance
-            ).toFixed(2)}`;
-
-    }
-
-
-    if (overviewBalanceText) {
-
-        if (
-            myBalance > 0.01
-        ) {
-
-            overviewBalanceText.textContent =
-                "You are owed this amount";
-
-            overviewBalance.style.color =
-                "#4ade80";
-
-        } else if (
-            myBalance < -0.01
-        ) {
-
-            overviewBalanceText.textContent =
-                "You owe this amount";
-
-            overviewBalance.style.color =
-                "#f87171";
-
         } else {
-
-            overviewBalanceText.textContent =
-                "All settled";
-
-            overviewBalance.style.color =
-                "#f8fafc";
-
+            throw new Error("No token");
         }
-
+    } catch (e) {
+        groups = JSON.parse(localStorage.getItem("smartSettleGroups") || "[]");
     }
 
+    // Determine Active Group
+    let selectedGroupId = localStorage.getItem("selectedGroupId");
+    if (selectedGroupId) {
+        selectedGroup = groups.find(g => String(g.groupId) === String(selectedGroupId));
+    }
+    if (!selectedGroup && groups.length > 0) {
+        selectedGroup = groups[0];
+        localStorage.setItem("selectedGroupId", selectedGroup.groupId);
+    }
 
-    function renderMembers() {
+    // 2. Fetch Expenses for Active Group
+    if (selectedGroup) {
+        try {
+            if (token) {
+                const res = await fetch(getApiUrl(`/api/expenses?groupId=${selectedGroup.groupId}`), {
+                    headers: { "Authorization": "Bearer " + token }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    expenses = data.expenses || (Array.isArray(data) ? data : []);
+                }
+            }
+        } catch (e) {
+            console.warn("Could not fetch expenses from backend:", e.message);
+        }
 
-        if (!dashboardMembers) {
+        // Fetch Settlements (Greedy Simplification Algorithm)
+        try {
+            if (token) {
+                const res = await fetch(getApiUrl(`/api/settlements?groupId=${selectedGroup.groupId}`), {
+                    headers: { "Authorization": "Bearer " + token }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    settlements = data.transactions || (Array.isArray(data) ? data : []);
+                }
+            }
+        } catch (e) {
+            console.warn("Could not fetch settlements:", e.message);
+        }
+    }
+
+    // Fallback expenses from localStorage if backend returned none
+    if (expenses.length === 0 && selectedGroup) {
+        const localExp = JSON.parse(localStorage.getItem("smartSettleExpenses") || "[]");
+        expenses = localExp.filter(x => String(x.groupId) === String(selectedGroup.groupId));
+    }
+
+    // 3. Render Dashboard Data
+    renderActiveGroupDetails();
+    renderOverviewStats();
+    renderGroupMembers();
+    renderRecentExpenses();
+
+    function renderActiveGroupDetails() {
+        if (!selectedGroup) {
+            if (dashboardGroupName) dashboardGroupName.textContent = "No Active Group";
+            if (dashboardMembersText) dashboardMembersText.textContent = "Create or join a group to start tracking.";
+            if (dashboardMemberCount) dashboardMemberCount.textContent = "0";
+            if (expenseCount) expenseCount.textContent = "0";
+            if (totalExpenses) totalExpenses.textContent = "₹0.00";
             return;
         }
 
+        if (dashboardGroupName) dashboardGroupName.textContent = selectedGroup.groupName;
+        const memberCount = selectedGroup.members ? selectedGroup.members.length : 0;
+        if (dashboardMembersText) dashboardMembersText.textContent = `${memberCount} member${memberCount !== 1 ? 's' : ''} in this group`;
+        if (dashboardMemberCount) dashboardMemberCount.textContent = memberCount;
+        if (expenseCount) expenseCount.textContent = expenses.length;
 
+        const totalSum = expenses.reduce((acc, x) => acc + (parseFloat(x.amount) || 0), 0);
+        if (totalExpenses) totalExpenses.textContent = `₹${totalSum.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+    }
+
+    function renderOverviewStats() {
+        if (!selectedGroup) return;
+
+        const totalSum = expenses.reduce((acc, x) => acc + (parseFloat(x.amount) || 0), 0);
+        if (overviewTotal) overviewTotal.textContent = `₹${totalSum.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+
+        // Amount paid by current user
+        const currentUserId = String(currentUser.userId).toUpperCase();
+        const paidByUser = expenses
+            .filter(x => String(x.payerId).toUpperCase() === currentUserId)
+            .reduce((acc, x) => acc + (parseFloat(x.amount) || 0), 0);
+
+        if (overviewPaid) overviewPaid.textContent = `₹${paidByUser.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+
+        // Calculate Balance from settlements
+        let youOwe = 0;
+        let youAreOwed = 0;
+        settlements.forEach(s => {
+            const fromId = String(s.from).toUpperCase();
+            const toId = String(s.to).toUpperCase();
+            if (fromId === currentUserId) youOwe += s.amount;
+            if (toId === currentUserId) youAreOwed += s.amount;
+        });
+
+        const netBalance = youAreOwed - youOwe;
+        if (overviewBalance) {
+            if (netBalance > 0) {
+                overviewBalance.textContent = `+₹${netBalance.toFixed(2)}`;
+                overviewBalance.style.color = "#10b981";
+                if (overviewBalanceText) overviewBalanceText.textContent = "You are owed";
+            } else if (netBalance < 0) {
+                overviewBalance.textContent = `-₹${Math.abs(netBalance).toFixed(2)}`;
+                overviewBalance.style.color = "#f87171";
+                if (overviewBalanceText) overviewBalanceText.textContent = "You owe money";
+            } else {
+                overviewBalance.textContent = "₹0.00";
+                overviewBalance.style.color = "#f8fafc";
+                if (overviewBalanceText) overviewBalanceText.textContent = "All settled up";
+            }
+        }
+    }
+
+    function renderGroupMembers() {
+        if (!dashboardMembers || !selectedGroup || !selectedGroup.members) return;
         dashboardMembers.innerHTML = "";
 
+        selectedGroup.members.forEach(m => {
+            const isG = typeof m === "object" && m.type === "guest";
+            const id = isG ? m.memberId : (m.userId || m);
+            const name = isG ? m.name : (m.name || id);
 
-        if (
-            members.length === 0
-        ) {
-
-            dashboardMembers.innerHTML = `
-
-                <div class="empty-dashboard">
-
-                    <i class="fa-solid fa-user-group"></i>
-
-                    <p>
-                        No members in this group
-                    </p>
-
+            const div = document.createElement("div");
+            div.className = "dashboard-member-item";
+            div.innerHTML = `
+                <div class="member-avatar">${String(name).charAt(0).toUpperCase()}</div>
+                <div class="member-details">
+                    <strong>${name}</strong>
+                    <span>${isG ? 'Guest Member' : id}</span>
                 </div>
-
             `;
-
-            return;
-
-        }
-
-
-        members.forEach(
-            member => {
-
-                const id =
-                    getMemberId(
-                        member
-                    );
-
-                const name =
-                    getMemberName(
-                        member
-                    );
-
-                const balance =
-                    Number(
-                        (
-                            balances[id] ||
-                            0
-                        ).toFixed(2)
-                    );
-
-
-                const initial =
-                    name
-                        .charAt(0)
-                        .toUpperCase();
-
-
-                const balanceText =
-                    balance > 0.01
-                        ? `+₹${balance.toFixed(2)}`
-                        : balance < -0.01
-                            ? `-₹${Math.abs(balance).toFixed(2)}`
-                            : "₹0.00";
-
-
-                const balanceClass =
-                    balance > 0.01
-                        ? "positive-member-balance"
-                        : balance < -0.01
-                            ? "negative-member-balance"
-                            : "";
-
-
-                const isMe =
-                    String(
-                        getMemberUserId(
-                            member
-                        )
-                    ).toUpperCase() ===
-                    myUserId;
-
-
-                const item =
-                    document.createElement(
-                        "div"
-                    );
-
-
-                item.className =
-                    "dashboard-member";
-
-
-                item.innerHTML = `
-
-                    <div class="member-info">
-
-                        <span class="member-avatar">
-                            ${initial}
-                        </span>
-
-                        <div>
-
-                            <strong>
-                                ${name}
-                            </strong>
-
-                            <small>
-                                ${
-                                    isMe
-                                        ? "You"
-                                        : isGuest(member)
-                                            ? "Guest Member"
-                                            : "Group member"
-                                }
-                            </small>
-
-                        </div>
-
-                    </div>
-
-                    <span class="member-balance ${balanceClass}">
-                        ${balanceText}
-                    </span>
-
-                `;
-
-
-                dashboardMembers.appendChild(
-                    item
-                );
-
-            }
-        );
-
+            dashboardMembers.appendChild(div);
+        });
     }
 
-
-    function renderExpenses() {
-
-        if (!recentExpenses) {
-            return;
-        }
-
-
+    function renderRecentExpenses() {
+        if (!recentExpenses) return;
         recentExpenses.innerHTML = "";
 
-
-        if (
-            expenses.length === 0
-        ) {
-
+        if (expenses.length === 0) {
             recentExpenses.innerHTML = `
-
-                <div class="empty-dashboard">
-
-                    <i class="fa-solid fa-receipt"></i>
-
-                    <p>
-                        No expenses yet
-                    </p>
-
-                    <a href="addExpense.html">
-                        Add your first expense
-                    </a>
-
+                <div style="text-align:center;padding:30px;color:#94a3b8;">
+                    <i class="fa-solid fa-receipt" style="font-size:32px;margin-bottom:10px;opacity:0.4;"></i>
+                    <p style="margin:0;">No expenses recorded yet.</p>
+                    <a href="addExpense.html" class="primary-button small-button" style="margin-top:12px;display:inline-flex;">Add First Expense</a>
                 </div>
-
             `;
-
             return;
-
         }
 
+        const sorted = [...expenses].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0)).slice(0, 8);
 
-        [
-            ...expenses
-        ]
-            .reverse()
-            .slice(
-                0,
-                5
-            )
-            .forEach(
-                expense => {
+        sorted.forEach(exp => {
+            const hasReceipt = Boolean(exp.receiptUrl);
+            const card = document.createElement("div");
+            card.className = "expense-item-card";
+            card.style.cssText = "display:flex;justify-content:space-between;align-items:center;padding:12px;background:rgba(15,23,42,0.6);border-radius:12px;margin-bottom:10px;border:1px solid rgba(255,255,255,0.06);";
 
-                    const payer =
-                        members.find(
-                            member =>
-                                String(
-                                    getMemberUserId(
-                                        member
-                                    )
-                                    || ""
-                                ).toUpperCase() ===
-                                String(
-                                    expense.payer ||
-                                    ""
-                                ).toUpperCase()
-                        );
+            const catIcon = getCategoryIcon(exp.category);
+            const dateStr = exp.date ? new Date(exp.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : 'Recent';
 
-
-                    const payerName =
-                        expense.payerName ||
-                        (
-                            payer
-                                ? getMemberName(
-                                    payer
-                                )
-                                : "Unknown"
-                        );
-
-
-                    const item =
-                        document.createElement(
-                            "div"
-                        );
-
-
-                    item.className =
-                        "expense-item";
-
-
-                    item.innerHTML = `
-
-                        <div class="expense-icon">
-
-                            <i class="fa-solid fa-receipt"></i>
-
-                        </div>
-
-                        <div class="expense-details">
-
-                            <strong>
-                                ${
-                                    expense.title ||
-                                    "Expense"
-                                }
-                            </strong>
-
-                            <small>
-                                Paid by ${payerName}
-                            </small>
-
-                        </div>
-
-                        <strong class="expense-amount">
-                            ₹${Number(
-                                expense.amount ||
-                                0
-                            ).toFixed(2)}
-                        </strong>
-
-                    `;
-
-
-                    recentExpenses.appendChild(
-                        item
-                    );
-
-                }
-            );
-
+            card.innerHTML = `
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:42px;height:42px;border-radius:10px;background:rgba(56,189,248,0.15);color:#38bdf8;display:flex;align-items:center;justify-content:center;font-size:18px;">
+                        <i class="${catIcon}"></i>
+                    </div>
+                    <div>
+                        <strong style="color:#f8fafc;font-size:14px;display:block;">${exp.title}</strong>
+                        <span style="font-size:11px;color:#94a3b8;">Paid by ${exp.payerName || exp.payerId} &bull; ${dateStr}</span>
+                        ${hasReceipt ? `
+                            <div>
+                                <button type="button" class="receipt-badge-btn" onclick="viewReceiptPhoto('${exp.receiptUrl}', '${exp.title.replace(/'/g, "\\'")}', '${(exp.receiptOriginalName || '').replace(/'/g, "\\'")}')">
+                                    <i class="fa-solid fa-paperclip"></i> View Receipt Photo (Multer)
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+                <div style="text-align:right;">
+                    <strong style="color:#f8fafc;font-size:15px;display:block;">₹${parseFloat(exp.amount).toFixed(2)}</strong>
+                    <span style="font-size:11px;color:#38bdf8;background:rgba(56,189,248,0.1);padding:2px 6px;border-radius:4px;">${exp.category || 'Food'}</span>
+                </div>
+            `;
+            recentExpenses.appendChild(card);
+        });
     }
 
+    function getCategoryIcon(category) {
+        switch (String(category).toLowerCase()) {
+            case 'food': return 'fa-solid fa-utensils';
+            case 'transport': return 'fa-solid fa-car';
+            case 'hotel': return 'fa-solid fa-hotel';
+            case 'shopping': return 'fa-solid fa-bag-shopping';
+            case 'activities': return 'fa-solid fa-ticket';
+            default: return 'fa-solid fa-receipt';
+        }
+    }
 
-    renderMembers();
+    // 4. CSV Export Feature (Lecture 32 & 34 Node.js Stream Pipeline)
+    if (btnExportCsvCard) {
+        btnExportCsvCard.addEventListener("click", () => {
+            if (!selectedGroup) return alert("Select a group first");
+            const exportUrl = `/api/expenses/export/csv?groupId=${selectedGroup.groupId}&token=${token}`;
+            window.open(exportUrl, '_blank');
+        });
+    }
 
-    renderExpenses();
+    // 5. System Health & V8 Heap Diagnostics (Lecture 31 & 35)
+    if (btnSystemHealthCard) {
+        btnSystemHealthCard.addEventListener("click", async () => {
+            if (diagnosticsModal) diagnosticsModal.style.display = "flex";
+            const diagJson = document.getElementById("diagJson");
+            const diagStatus = document.getElementById("diagStatus");
+            const diagDbStatus = document.getElementById("diagDbStatus");
+            const diagHeapUsed = document.getElementById("diagHeapUsed");
+            const diagHeapTotal = document.getElementById("diagHeapTotal");
 
+            try {
+                const res = await fetch(getApiUrl("/api/health"));
+                const data = await res.json();
+                if (diagJson) diagJson.textContent = JSON.stringify(data, null, 2);
+                if (diagStatus) diagStatus.textContent = data.status === "ok" ? "Active (Online)" : "Degraded";
+                if (diagDbStatus) diagDbStatus.textContent = data.databaseConnected ? "Connected (Atlas)" : "Disconnected";
+                if (data.v8HeapStatistics) {
+                    const usedMB = (data.v8HeapStatistics.used_heap_size / (1024 * 1024)).toFixed(1);
+                    const totalMB = (data.v8HeapStatistics.total_heap_size / (1024 * 1024)).toFixed(1);
+                    if (diagHeapUsed) diagHeapUsed.textContent = `${usedMB} MB`;
+                    if (diagHeapTotal) diagHeapTotal.textContent = `${totalMB} MB`;
+                }
+            } catch (err) {
+                if (diagJson) diagJson.textContent = "Error fetching /api/health: " + err.message;
+            }
+        });
+    }
 });

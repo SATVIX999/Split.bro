@@ -22,6 +22,9 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("dropdownUserId");
 
 
+    /*
+       USER DROPDOWN
+    */
 
     if (userMenuButton && userDropdown) {
 
@@ -69,6 +72,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     }
 
+
+    /*
+       USER INFORMATION
+    */
 
     try {
 
@@ -128,6 +135,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
+    /*
+       LOGOUT
+    */
 
     if (logoutButton) {
 
@@ -162,6 +172,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
+    /*
+       ACTIVE GROUP CHECK
+    */
 
     const groups =
         JSON.parse(
@@ -183,6 +196,9 @@ document.addEventListener("DOMContentLoaded", function () {
         );
 
 
+    /*
+       ADD EXPENSE
+    */
 
     const addExpenseLinks =
         document.querySelectorAll(
@@ -217,6 +233,9 @@ document.addEventListener("DOMContentLoaded", function () {
     );
 
 
+    /*
+       SETTLEMENT
+    */
 
     const settlementLinks =
         document.querySelectorAll(
