@@ -6,5 +6,6 @@ const { protect } = require('../middleware/auth');
 router.get('/group/:groupId', protect, insightController.getGroupInsights);
 router.get('/user', protect, insightController.getUserInsights);
 
+
 module.exports = router;
 
