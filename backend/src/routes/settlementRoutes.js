@@ -9,3 +9,4 @@ router.get('/balances/:groupId', protect, settlementController.getBalancesAndSug
 router.post('/', protect, validateSettlement, settlementController.createSettlement);
 
 module.exports = router;
+
