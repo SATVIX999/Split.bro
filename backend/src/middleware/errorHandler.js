@@ -14,6 +14,7 @@ const errorHandler = (err, req, res, next) => {
         const message = `Resource not found with invalid ID format: ${err.value}`;
         error = new AppError(message, 400);
     }
+    
 
     if (err.code === 11000) {
         const field = Object.keys(err.keyValue || {})[0] || 'field';
