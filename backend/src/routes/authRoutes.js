@@ -10,4 +10,5 @@ router.get('/me', protect, authController.getMe);
 router.patch('/me', protect, authController.updateProfile);
 router.post('/logout', authController.logout);
 
+
 module.exports = router;
