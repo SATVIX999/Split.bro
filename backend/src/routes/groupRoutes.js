@@ -4,6 +4,7 @@ const groupController = require('../controllers/groupController');
 const { protect } = require('../middleware/auth');
 const { validateGroup } = require('../middleware/validator');
 
+
 router.get('/', protect, groupController.getGroups);
 router.post('/', protect, validateGroup, groupController.createGroup);
 router.post('/join', protect, groupController.joinGroupByCode);
