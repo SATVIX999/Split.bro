@@ -9,6 +9,7 @@ if (!fs.existsSync(config.receiptsDir)) {
     fs.mkdirSync(config.receiptsDir, { recursive: true });
 }
 
+
 const ALLOWED_MIME_TYPES = [
     'image/jpeg',
     'image/png',
