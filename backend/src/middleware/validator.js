@@ -10,6 +10,7 @@ const handleValidationErrors = (req, res, next) => {
     next();
 };
 
+
 const validateRegister = [
     body('name')
         .trim()
