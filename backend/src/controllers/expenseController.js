@@ -383,7 +383,7 @@ const getReceipt = async (req, res, next) => {
             return next(new AppError('You are not authorized to view receipts for this group', 403));
         }
 
-        res.sendFile(resolvedPath);
+        res.sendFile(filename, { root: safeBase });
     } catch (err) {
         next(err);
     }

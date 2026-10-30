@@ -190,14 +190,14 @@ flowchart LR
 ```powershell
 # Clone the repository
 git clone https://github.com/SATVIX999/Split.bro.git
-cd Split.bro
+cd Split.bro/backend
 
 # Install backend dependencies
 npm install
 ```
 
 ### 3. Environment Configuration
-Create a `.env` file in the root folder (or use `.env.example` as a template):
+Create a `.env` file in the `backend/` folder (or use `backend/.env.example` as a template):
 ```env
 PORT=3000
 NODE_ENV=development
@@ -209,13 +209,11 @@ CORS_ORIGIN=http://localhost:3000,http://127.0.0.1:3000,http://localhost:5500,ht
 
 ### 4. Run the Project
 ```powershell
-# Start the backend server with nodemon
-npm run dev
+# Start the backend server (from backend/ directory)
+npm start
+# Or directly: node src/server.js
 
-# (Optional) Seed demo users and groups into Atlas
-npm run seed
-
-# Run the automated test suite (60 tests)
+# Run the automated test suite (70 tests)
 npm test
 ```
 
